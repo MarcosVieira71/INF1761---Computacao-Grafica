@@ -1,0 +1,6 @@
+*.o
+*.exe
+*.exe      # Windows
+*.out      # Linux/Unix
+*.app      # macOS
+*[^.]   # ignora arquivos que não têm ponto no nome
