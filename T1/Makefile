@@ -1,31 +1,22 @@
-
 TARGET = main
 
-all: $(TARGET)
-
+CPP = g++
+CPPFLAGS = -g -Wall -std=c++17 -DGL_SILENCE_DEPRECATION
 INC = -I.
 LIB = -L.
-
-CPP = g++
-#CPPFLAGS = -O2 -Wall -std=c++17 -DGL_SILENCE_DEPRECATION 
-CPPFLAGS = -g -Wall -std=c++17 -DGL_SILENCE_DEPRECATION 
+LDFLAGS = -lstdc++ -lGL -lGLEW -lglfw -ldl -lpthread -lX11 -lXrandr
 
 SRC = \
   error.cpp \
   shader.cpp \
   main.cpp \
+  polygon.cpp \
   triangle.cpp
 
-OBJ = $(addsuffix .o, $(basename $(SRC))) 
+all: $(TARGET)
 
-.cpp.o:
-	$(CPP) $(INC) $(CPPFLAGS) -c $< -o $@ 
-
-$(TARGET): $(OBJ) Makefile 
-	$(CPP) $(LIB) -o $@ $(OBJ) -lstdc++ -lGL -lGLEW -lglfw -ldl -lpthread -lX11 -lXrandr 
-
+$(TARGET): $(SRC) Makefile
+	$(CPP) $(INC) $(CPPFLAGS) $(SRC) $(LIB) $(LDFLAGS) -o $(TARGET)
 
 clean:
-	rm -f $(TARGET) $(OBJ)
-
-
+	rm -f $(TARGET)

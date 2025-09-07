@@ -18,11 +18,13 @@
 #include "error.h"
 #include "triangle.h"
 #include "shader.h"
+#include "polygon.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 static TrianglePtr tri;
+static PolygonPtr poly;
 static ShaderPtr shd;
 
 static void error (int code, const char* msg)
@@ -46,7 +48,17 @@ static void resize (GLFWwindow* win, int width, int height)
 static void initialize ()
 {
   glClearColor(1.0f,1.0f,1.0f,1.0f);
-  tri = Triangle::Make();
+  
+  std::vector<glm::vec2> vertices = {{-0.5f,0.5f}, {-0.5f,-0.5f}, {0.5f,-0.35f}, {0.55f, 0.55f}, {-0.05f, 0.20f}};
+  std::vector<glm::vec3> colors = {{0,0,1}, {0,1,0}, {1,0,1}, {1, 0.984, 0}, {1,0,0}} ;
+  std::vector<unsigned int> idxs = {
+    0, 1, 2,
+    0, 2, 4,
+    2, 3, 4
+  };
+
+  poly = Polygon::Make(vertices, colors, idxs);
+  
   shd = Shader::Make();
   shd->AttachVertexShader("shaders/vertex.glsl");
   shd->AttachFragmentShader("shaders/fragment.glsl");
@@ -58,7 +70,7 @@ static void display (GLFWwindow* win)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   shd->UseProgram();
-  tri->Draw();
+  poly->Draw();
   Error::Check("display");
 }
 
