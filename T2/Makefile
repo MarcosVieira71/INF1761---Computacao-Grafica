@@ -10,9 +10,10 @@ SRC = \
   error.cpp \
   shader.cpp \
   main.cpp \
-  polygon.cpp \
-  triangle.cpp
-
+  Clock.cpp \
+  Hand.cpp \
+  Circle.cpp \
+  
 all: $(TARGET)
 
 $(TARGET): $(SRC) Makefile

@@ -49,12 +49,12 @@ static void initialize ()
 {
   glClearColor(1.0f,1.0f,1.0f,1.0f);
   
-  std::vector<glm::vec2> vertices = {{-0.5f,0.5f}, {-0.5f,-0.5f}, {0.5f,-0.35f}, {0.55f, 0.55f}, {-0.05f, 0.20f}};
-  std::vector<glm::vec3> colors = {{0,0,1}, {0,1,0}, {1,0,1}, {1, 0.984, 0}, {1,0,0}} ;
+  std::vector<glm::vec2> vertices = {{-0.5f,0.5f}, {-0.5f,-0.5f}, {0.0f,-0.0f}, {0.75f, -0.5f},{0.9f, 0.5f}};
+  std::vector<glm::vec3> colors = {{0,0,1}, {0,1,0}, {1,0,0}, {1,0,1},  {1, 0.984, 0}} ;
   std::vector<unsigned int> idxs = {
-    0, 1, 2,
-    0, 2, 4,
-    2, 3, 4
+    2, 0, 1, 
+    1, 3, 2,
+    2, 3, 4 
   };
 
   poly = Polygon::Make(vertices, colors, idxs);
