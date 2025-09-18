@@ -25,6 +25,7 @@ private:
     float m_radius;
 
     CirclePtr m_face;
+    CirclePtr m_dot;
     HandPtr m_hourHand;
     HandPtr m_minuteHand;
     HandPtr m_secondHand;

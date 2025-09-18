@@ -8,10 +8,10 @@ Clock::Clock(const glm::vec2& center, float radius)
     : m_center(center), m_radius(radius)
 {
     m_face = Circle::Make(center, radius, 60);
-
+    m_dot = Circle::Make(center, radius * 0.03f, 30);
     m_hourHand   = Hand::Make(center, radius * 0.5f, radius * 0.05f);
     m_minuteHand = Hand::Make(center, radius * 0.7f, radius * 0.06f);
-    m_secondHand = Hand::Make(center, radius * 0.9f, radius * 0.03f);
+    m_secondHand = Hand::Make(center, radius * 0.85f, radius * 0.05f);
 }
 
 ClockPtr Clock::Make(const glm::vec2& center, float radius) {
@@ -26,41 +26,46 @@ void Clock::Update()
     time_t t = system_clock::to_time_t(now);
     tm localTime = *localtime(&t);
 
-    float hours = static_cast<float>(localTime.tm_hour % 12) + localTime.tm_min / 60.0f;
+    float hours   = static_cast<float>(localTime.tm_hour % 12) + localTime.tm_min / 60.0f;
     float minutes = static_cast<float>(localTime.tm_min) + localTime.tm_sec / 60.0f;
-    float seconds = static_cast<float>(localTime.tm_sec);
-
+    float seconds = static_cast<float>(localTime.tm_sec); 
     m_hourAngle   = glm::radians(360.0f * (hours / 12.0f));
     m_minuteAngle = glm::radians(360.0f * (minutes / 60.0f));
-    m_secondAngle = glm::radians(360.0f * (seconds / 60.0f));
+    m_secondAngle = glm::radians(360.0f * (seconds / 60.0f)); 
 }
 
 void Clock::Draw(const ShaderPtr& shd, const glm::mat4& proj) const
 {
-    glm::vec3 faceColor = glm::vec3(1.0f);
-    glm::mat4 faceModel = glm::mat4(1.0f);
-    
+    glm::mat4 idModel = glm::mat4(1.0f);
+
+    // face
     shd->SetUniform("proj", proj);
-    shd->SetUniform("model", faceModel);
-    shd->SetUniform("uniformColor", faceColor);
+    shd->SetUniform("model", idModel);
+    shd->SetUniform("uniformColor", glm::vec3(1.0f));
     m_face->Draw();
-    
-    glm::vec3 handColor = glm::vec3(0.0f);
-    glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(1.1f, 1.0f, 1.0f)); // ou algum fator
-    glm::mat4 baseModel = glm::translate(glm::mat4(1.0f), glm::vec3(m_center, 0.0f)) * scaleMat;
+
+    glm::mat4 baseModel = glm::translate(glm::mat4(1.0f), glm::vec3(m_center, 0.0f));
+
+    glm::mat4 hourModel   = glm::rotate(baseModel, -m_hourAngle,   glm::vec3(0,0,1));
+    glm::mat4 minuteModel = glm::rotate(baseModel, -m_minuteAngle, glm::vec3(0,0,1));
+    glm::mat4 secondModel = glm::rotate(baseModel, -m_secondAngle, glm::vec3(0,0,1));
 
 
-    glm::mat4 hourModel = glm::rotate(baseModel, -m_hourAngle, glm::vec3(0,0,1));
+    //horas
     shd->SetUniform("model", hourModel);
-    shd->SetUniform("uniformColor", handColor);
+    shd->SetUniform("uniformColor", glm::vec3(0.0f));
     m_hourHand->Draw();
 
-    glm::mat4 minModel = glm::rotate(baseModel, -m_minuteAngle, glm::vec3(0,0,1));
-    shd->SetUniform("model", minModel);
+    // minutos
+    shd->SetUniform("model", minuteModel);
     m_minuteHand->Draw();
 
-    glm::mat4 secModel = glm::rotate(baseModel, -m_secondAngle, glm::vec3(0,0,1));
-    shd->SetUniform("model", secModel);
+    // segundos
+    shd->SetUniform("model", secondModel);
     m_secondHand->Draw();
-}
 
+    // ponto central por cima de tudo
+    shd->SetUniform("model", idModel);
+    shd->SetUniform("uniformColor", glm::vec3(1.0f,0.0f,0.0f));
+    m_dot->Draw();
+}

@@ -1,8 +1,8 @@
 #include "Hand.h"
 #include <glm/gtc/type_ptr.hpp>
 
-Hand::Hand(const glm::vec2& center, float length, float width)
-    : m_center(center), m_length(length), m_width(width)
+Hand::Hand(float length, float width)
+    : m_length(length), m_width(width)
 {
     InitVertices();
     m_vertexNum = 3;
@@ -19,9 +19,9 @@ Hand::Hand(const glm::vec2& center, float length, float width)
     glBindVertexArray(0);
 }
 
-HandPtr Hand::Make(const glm::vec2& center, float length, float width)
+HandPtr Hand::Make(float length, float width)
 {
-    return std::make_shared<Hand>(center, length, width);
+    return std::make_shared<Hand>(length, width);
 }
 
 Hand::~Hand()

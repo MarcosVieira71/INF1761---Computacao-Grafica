@@ -8,17 +8,16 @@ using HandPtr = std::shared_ptr<Hand>;
 
 class Hand {
 public:
-    Hand(const glm::vec2& center, float length, float width);
+    Hand(float length, float width);
     ~Hand();
 
-    static HandPtr Make(const glm::vec2& center, float length, float width);
+    static HandPtr Make(float length, float width);
 
     void Draw() const;
 
 private:
     void InitVertices();
 
-    glm::vec2 m_center;
     float m_length;
     float m_width;
 
