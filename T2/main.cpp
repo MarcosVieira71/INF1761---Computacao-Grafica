@@ -47,7 +47,7 @@ static void initialize()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     glm::vec2 center(300.0f, 200.0f); 
-    float radius = 200.0f;
+    float radius = 150.0f;
     v_clock = Clock::Make(center, radius);
 
     shd = Shader::Make();

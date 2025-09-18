@@ -1,4 +1,14 @@
 #include "Hand.h"
+
+#ifdef _WIN32
+    #include <glad/glad.h>
+#elif __APPLE__
+    #include <OpenGL/gl3.h>
+#else
+    #include <GL/glew.h>
+    #include <GL/gl.h>
+#endif
+
 #include <glm/gtc/type_ptr.hpp>
 
 Hand::Hand(float length, float width)

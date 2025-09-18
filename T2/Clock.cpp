@@ -1,5 +1,14 @@
 #include "Clock.h"
 
+#ifdef _WIN32
+    #include <glad/glad.h>
+#elif __APPLE__
+    #include <OpenGL/gl3.h>
+#else
+    #include <GL/glew.h>
+    #include <GL/gl.h>
+#endif
+
 #include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,10 +17,10 @@ Clock::Clock(const glm::vec2& center, float radius)
     : m_center(center), m_radius(radius)
 {
     m_face = Circle::Make(center, radius, 60);
-    m_dot = Circle::Make(center, radius * 0.03f, 30);
-    m_hourHand   = Hand::Make(center, radius * 0.5f, radius * 0.05f);
-    m_minuteHand = Hand::Make(center, radius * 0.7f, radius * 0.06f);
-    m_secondHand = Hand::Make(center, radius * 0.85f, radius * 0.05f);
+    m_dot = Circle::Make(center, radius * 0.045f, 64);
+    m_hourHand   = Hand::Make(radius * 0.4f, radius * 0.07f);
+    m_minuteHand = Hand::Make(radius * 0.6f, radius * 0.07f);
+    m_secondHand = Hand::Make(radius * 0.8f, radius * 0.07f);
 }
 
 ClockPtr Clock::Make(const glm::vec2& center, float radius) {
