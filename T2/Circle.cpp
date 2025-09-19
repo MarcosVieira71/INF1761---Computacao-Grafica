@@ -12,14 +12,17 @@
 #include <glm/ext.hpp>
 #include <cmath>
 
-Circle::Circle(const glm::vec2& center, std::size_t radius, std::size_t segments)
+Circle::Circle(float radius, std::size_t segments)
 {
     std::vector<glm::vec2> vertices;
-    vertices.push_back(center); 
+    vertices.push_back(glm::vec2(0.0f)); // centro na origem
 
     for (size_t i = 0; i <= segments; i++) {
         float angle = i * glm::two_pi<float>() / segments;
-        vertices.push_back(center + glm::vec2(radius * cos(angle), radius * sin(angle)));
+        vertices.push_back(glm::vec2(
+            radius * cos(angle),
+            radius * sin(angle)
+        ));
     }
 
     m_vertexNum = static_cast<GLsizei>(vertices.size());
@@ -43,9 +46,9 @@ Circle::~Circle()
     glDeleteVertexArrays(1, &m_vao);
 }
 
-CirclePtr Circle::Make(const glm::vec2& center, std::size_t radius, std::size_t segments)
+CirclePtr Circle::Make(float radius, std::size_t segments)
 {
-  return CirclePtr(new Circle(center, radius, segments));
+    return CirclePtr(new Circle(radius, segments));
 }
 
 void Circle::Draw()

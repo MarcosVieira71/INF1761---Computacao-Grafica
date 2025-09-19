@@ -20,7 +20,8 @@
 #include <stdlib.h>
 #include <chrono>
 
-static ClockPtr v_clock;
+static ClockPtr clock1;
+static ClockPtr clock2;
 static ShaderPtr shd;
 
 
@@ -47,8 +48,9 @@ static void initialize()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     glm::vec2 center(300.0f, 200.0f); 
+
     float radius = 150.0f;
-    v_clock = Clock::Make(center, radius);
+    clock2 = Clock::Make(center, radius, true);
 
     shd = Shader::Make();
     shd->AttachVertexShader("shaders/vertex.glsl");
@@ -65,8 +67,9 @@ static void display(GLFWwindow* win)
     glm::mat4 proj = glm::ortho(0.0f, 600.0f, 0.0f, 400.0f, -1.0f, 1.0f);
     shd->UseProgram();
 
-    v_clock->Update();
-    v_clock->Draw(shd, proj);
+    clock2->Update();
+    clock2->Draw(shd, proj);
+
 
     Error::Check("display");        
 }
@@ -81,7 +84,7 @@ int main()
 
     glfwSetErrorCallback(error);
 
-    GLFWwindow* win = glfwCreateWindow(600, 400, "Clock Test", nullptr, nullptr);
+    GLFWwindow* win = glfwCreateWindow(600, 400, "Clock", nullptr, nullptr);
     glfwSetFramebufferSizeCallback(win, resize);
     glfwSetKeyCallback(win, keyboard);
 

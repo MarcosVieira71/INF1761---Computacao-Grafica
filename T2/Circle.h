@@ -17,14 +17,12 @@ private:
 
 
 protected:
-Circle(const glm::vec2& center,
-        std::size_t radius,
-        std::size_t segments);
+Circle(float radius,
+      std::size_t segments);
 public:
 
-  static CirclePtr Make (const glm::vec2& center,
-                            std::size_t radius,
-                            std::size_t segments);
+  static CirclePtr Make (float radius,
+                        std::size_t segments);
   virtual ~Circle ();
   virtual void Draw ();
 };

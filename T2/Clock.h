@@ -12,10 +12,10 @@ using ClockPtr = std::shared_ptr<Clock>;
 
 class Clock {
 public:
-    Clock(const glm::vec2& center, float radius);
+    Clock(const glm::vec2& center, float radius, bool continuous = false);
     ~Clock() = default;
 
-    static ClockPtr Make(const glm::vec2& center, float radius);
+    static ClockPtr Make(const glm::vec2& center, float radius, bool continuous = false);
 
     void Update(); 
     void Draw(const ShaderPtr& shd, const glm::mat4& proj) const;
@@ -29,7 +29,7 @@ private:
     HandPtr m_hourHand;
     HandPtr m_minuteHand;
     HandPtr m_secondHand;
-
+    bool m_continuous;
     float m_hourAngle   = 0.0f;
     float m_minuteAngle = 0.0f;
     float m_secondAngle = 0.0f;
