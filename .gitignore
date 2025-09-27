@@ -5,3 +5,5 @@
 *.app      
 main
 .vscode
+
+build
