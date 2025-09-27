@@ -1,14 +1,12 @@
-#include "Error.h"
-
+#include "error.h"
 #ifdef _WIN32
-    #include <glad/glad.h>
+//#define GLAD_GL_IMPLEMENTATION // Necessary for headeronly version.
+#include <glad/gl.h>
 #elif __APPLE__
-    #include <OpenGL/gl3.h>
-#else
-    #include <GL/glew.h>
-    #include <GL/gl.h>
+#include <OpenGL/gl3.h>
+#else 
+#include <GL/glew.h>
 #endif
-
 #include <iostream>
 #include <cstdlib>
 

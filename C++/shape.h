@@ -1,11 +1,11 @@
 #include <memory>
-#pragma once
-
 class Shape;
 using ShapePtr = std::shared_ptr<Shape>; 
 
-class State;
-using StatePtr = std::shared_ptr<State>; 
+#ifndef SHAPE_H
+#define SHAPE_H
+
+#include "state.h"
 
 class Shape {
 protected:
@@ -21,3 +21,4 @@ public:
   virtual void Draw (StatePtr st) = 0;
 };
 
+#endif
