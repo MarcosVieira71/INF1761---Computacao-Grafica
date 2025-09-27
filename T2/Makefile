@@ -7,7 +7,7 @@ LIB = -L.
 LDFLAGS = -lstdc++ -lGL -lGLEW -lglfw -ldl -lpthread -lX11 -lXrandr
 
 SRC = \
-  error.cpp \
+  Error.cpp \
   shader.cpp \
   main.cpp \
   Clock.cpp \
