@@ -26,8 +26,7 @@ void SolarSystem::lightSetup()
 {
     m_sunLight = Light::Make(5.0f, 5.0f, 5.0f, 1.0f, "world");
     m_sunLight->SetAmbient(1.0f, 1.0f, 1.0f);
-    m_sunLight->SetDiffuse(1.0f, 1.0f, 1.0f);
-    m_sunLight->SetSpecular(1.0f, 1.0f, 1.0f);
+
 }
 
 void SolarSystem::shaderSetup()
