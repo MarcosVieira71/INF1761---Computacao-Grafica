@@ -43,52 +43,6 @@ int main() {
     glViewport(0, 0, 800, 600);
 
 
-
-
-
-    // auto trfEarth = Transform::Make();
-    // auto trfEarthOrbit = Transform::Make();
-
-    // auto trfMoon = Transform::Make();
-    // auto trfMoonOrbit = Transform::Make();
-
-    // // trfEarth->Translate(4.0f, 0.0f, 0.0f);
-    // // trfEarth->Scale(0.5f, 0.5f, 1.0f);
-
-    // // trfMoon->Translate(3.0f, 0.0f, 0.0f);
-    // // trfMoon->Scale(0.3f, 0.3f, 1.0f);
-
-
-    
-    // // NodePtr earthOrbitNode = Node::Builder()
-    // //     .WithTransform(trfEarthOrbit)
-    // //     .Build();
-
-    // // NodePtr earthNode = Node::Builder()
-    // //     .WithTransform(trfEarth)
-    // //     .AddAppearance(Color::Make(0,0,1))
-    // //     .AddShape(Disk::Make(1.0f, 32))
-    // //     .Build();
-
-    // // NodePtr moonOrbitNode = Node::Builder()
-    // //     .WithTransform(trfMoonOrbit)
-    // //     .Build();
-
-    // // NodePtr moonNode = Node::Builder()
-    // //     .WithTransform(trfMoon)
-    // //     .AddAppearance(Color::Make(1,0,0))
-    // //     .AddShape(Disk::Make(1.0f, 32))
-    // //     .Build();
-
-
-    // // sunNode->AddNode(earthOrbitNode);
-    // // earthOrbitNode->AddNode(earthNode);
-
-    // // earthNode->AddNode(moonOrbitNode);
-    // // moonOrbitNode->AddNode(moonNode);
-
-    // auto engine = SolarSystemEngine::Make(trfSun, trfEarthOrbit, trfMoonOrbit, trfEarth);
-
     SolarSystem s = SolarSystem();
     float t0 = float(glfwGetTime());
     while (!glfwWindowShouldClose(window)) {
