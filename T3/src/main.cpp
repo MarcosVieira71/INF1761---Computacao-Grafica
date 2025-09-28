@@ -21,7 +21,6 @@
 
 int main() {
 
-    // 1️⃣ Inicializa GLFW
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return -1;
@@ -44,7 +43,7 @@ int main() {
     }
     #endif
     
-    glewExperimental = GL_TRUE;  // ativa algumas extensões modernas
+    glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
         std::cerr << "Failed to initialize GLEW\n";
         return -1;
