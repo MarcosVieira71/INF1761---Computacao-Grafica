@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 #endif
 
-#include "error.h"
+#include "Error.h"
 #include "shader.h"
 #include "Clock.h"
 

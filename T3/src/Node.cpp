@@ -63,8 +63,6 @@ void Node::SetShader(ShaderPtr shader) {
     m_shader = shader;
 }
 
-
-
 void Node::AddShape(ShapePtr shp) {
     m_shps.push_back(shp);
 }

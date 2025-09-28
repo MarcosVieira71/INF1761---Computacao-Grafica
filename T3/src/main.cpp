@@ -8,6 +8,7 @@
 #include "Color.h"
 #include "Scene.h"
 #include "State.h"
+#include "SolarSystemEngine.h"
 #include "Transform.h"
 
 #include <GL/glew.h>   
@@ -53,18 +54,61 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, 800, 600);
 
-    auto trf1 = Transform::Make();
-
+    auto trfSun = Transform::Make();
+    trfSun->Translate(5.0f,5.0f, 1);
+    trfSun->Scale(0.8f,0.8f, 1);
+    
     ShaderPtr shader = Shader::Make();
     shader->AttachVertexShader("../shaders/vertex.glsl");
     shader->AttachFragmentShader("../shaders/fragment.glsl");
     shader->Link();
 
     NodePtr sunNode = Node::Builder()
-                        .WithTransform(trf1)
+                        .WithTransform(trfSun)
                         .AddAppearance(Color::Make(1,1,1))
                         .AddShape(Disk::Make(1.0f, 32))
                         .Build();
+
+    auto trfEarth = Transform::Make();
+    auto trfEarthOrbit = Transform::Make();
+
+    auto trfMoon = Transform::Make();
+    auto trfMoonOrbit = Transform::Make();
+
+    trfEarth->Translate(4.0f, 0.0f, 0.0f);
+    trfEarth->Scale(0.5f, 0.5f, 1.0f);
+
+    trfMoon->Translate(3.0f, 0.0f, 0.0f);
+    trfMoon->Scale(0.3f, 0.3f, 1.0f);
+
+    NodePtr earthOrbitNode = Node::Builder()
+        .WithTransform(trfEarthOrbit)
+        .Build();
+
+    NodePtr earthNode = Node::Builder()
+        .WithTransform(trfEarth)
+        .AddAppearance(Color::Make(0,0,1))
+        .AddShape(Disk::Make(1.0f, 32))
+        .Build();
+
+    NodePtr moonOrbitNode = Node::Builder()
+        .WithTransform(trfMoonOrbit)
+        .Build();
+
+    NodePtr moonNode = Node::Builder()
+        .WithTransform(trfMoon)
+        .AddAppearance(Color::Make(1,0,0))
+        .AddShape(Disk::Make(1.0f, 32))
+        .Build();
+
+
+    sunNode->AddNode(earthOrbitNode);
+    earthOrbitNode->AddNode(earthNode);
+
+    earthNode->AddNode(moonOrbitNode);
+    moonOrbitNode->AddNode(moonNode);
+
+    auto engine = SolarSystemEngine::Make(trfSun, trfEarthOrbit, trfMoonOrbit);
 
     NodePtr rootNode = Node::Builder()
                         .WithShader(shader)
@@ -72,10 +116,15 @@ int main() {
                         .Build();
 
     ScenePtr scene = Scene::Make(rootNode);
+    scene->AddEngine(engine);
     Camera2DPtr camera2D = Camera2D::Make(0,10,0,10);
+    
+    float t0 = float(glfwGetTime());
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        float t = float(glfwGetTime());
+        scene->Update(t-t0);
+        t0 = t;
         scene->Render(camera2D);
 
         glfwSwapBuffers(window);
