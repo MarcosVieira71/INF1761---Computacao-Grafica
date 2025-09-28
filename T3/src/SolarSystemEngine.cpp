@@ -5,22 +5,18 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-SolarSystemEngine::SolarSystemEngine(TransformPtr sunTrf, TransformPtr earthTrf, TransformPtr moonTrf)
-        : m_sunTrf(sunTrf), m_earthTrf(earthTrf), m_moonTrf(moonTrf)
+SolarSystemEngine::SolarSystemEngine(TransformPtr earthOrbitTrf, TransformPtr moonOrbitTrf)
+        : m_earthOrbitTrf(earthOrbitTrf), m_moonOrbitTrf(moonOrbitTrf)
     {}
 
-void SolarSystemEngine::Update(float dt) {
-    m_time += dt;
-
-    m_earthTrf->LoadIdentity();            
-    m_earthTrf->Rotate(m_time * m_earthSpeedSun, 0, 0, 1);
-
-    m_moonTrf->LoadIdentity();
-    m_moonTrf->Rotate(m_time * m_moonSpeedEarth, 0, 0, 1); 
+void SolarSystemEngine::Update(float dt)
+{
+    m_earthOrbitTrf->Rotate(dt * m_earthSpeedSun, 0, 0, 1);
+    m_moonOrbitTrf->Rotate(dt * m_moonSpeedEarth, 0, 0, 1);
 }
 
 
-EnginePtr SolarSystemEngine::Make(TransformPtr sunTrf, TransformPtr earthTrf, TransformPtr moonTrf)
+EnginePtr SolarSystemEngine::Make(TransformPtr earthOrbitTrf, TransformPtr moonOrbitTrf)
 {
-    return EnginePtr(new SolarSystemEngine(sunTrf, earthTrf, moonTrf));
+    return EnginePtr(new SolarSystemEngine(earthOrbitTrf, moonOrbitTrf));
 }
