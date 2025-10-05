@@ -26,11 +26,13 @@ private:
     NodePtr m_container;
 
     NodePtr m_root;
-
+    
+    float width = 20.0f;      
+    float height = 5.0f;    
 
     void setupContainer();
     void setupShader();
-
+    void setupBalls();
     void setupScene();
     
     

@@ -3,16 +3,23 @@
 #include "Node.h"
 #include "Rectangle.h"
 #include "Color.h"
+#include "Disk.h"
+#include "Ball.h"
 #include "Transform.h"
 #include "Shader.h"
 #include "Scene.h"
 #include "Camera2D.h"
+#include "PoolEngine.h"
+
+#include <map>
+#include <vector>
 
 
 PoolSimulator::PoolSimulator()
 {
     setupShader();
     setupContainer();
+    setupBalls();
     setupScene();
 
 }
@@ -33,9 +40,6 @@ void PoolSimulator::setupShader()
 
 void PoolSimulator::setupContainer()
 {
-    float width = 20.0f;      
-    float height = 5.0f;      
-
     
     TransformPtr leftTransform = Transform::Make();
     leftTransform->Translate(-width/2, 0.0f, 0.0f);
@@ -78,6 +82,44 @@ void PoolSimulator::setupContainer()
                     .Build();
 }
 
+void PoolSimulator::setupBalls()
+{
+    std::map<Ball*, NodePtr> ballNodeMap;
+
+    int numBalls = 100;
+    float radius = 0.5f;
+
+    for (int i = 0; i < numBalls; ++i)
+    {
+        float x = -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f;
+        float y = 0.5f + i * (radius * 2.1f);
+        float z = 0.0f;
+        glm::vec3 pos(x, y, z);
+
+        std::unique_ptr<Ball> ball = std::make_unique<Ball>(pos, radius);
+
+        auto ballTransform = Transform::Make();
+        ballTransform->Translate(x, y, z);
+
+        NodePtr node = Node::Builder()
+            .WithShader(m_shader)
+            .AddShape(Disk::Make(radius, 64))
+            .AddAppearance(Color::Make(1,0,1))
+            .WithTransform(ballTransform)
+            .Build();
+
+        m_container->AddNode(node);
+
+        ballNodeMap[ball.release()] = node;
+    }
+
+    glm::vec3 leftWallPos(-width/2, 0.0f, 0.0f);
+    glm::vec3 rightWallPos(width/2, 0.0f, 0.0f);
+    glm::vec3 floorPos(0.0f, -8.0f, 0.0f);
+    m_engine = PoolEngine::Make(ballNodeMap, rightWallPos, leftWallPos, floorPos);
+}
+
+
 
 void PoolSimulator::setupScene()
 {
@@ -87,7 +129,7 @@ void PoolSimulator::setupScene()
             .Build();
     
     m_scene = Scene::Make(m_root);
-    // m_scene->AddEngine(PoolPhysicsEngine::Make());
+    m_scene->AddEngine(m_engine);
     m_camera = Camera2D::Make(-10, 10, -10, 10);
 }
 

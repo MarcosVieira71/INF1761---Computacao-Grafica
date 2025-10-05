@@ -59,6 +59,9 @@ public:
     void AddShape(ShapePtr shp);
     void AddNode(NodePtr node);
     void SetParent(NodePtr parent);
+    TransformPtr GetTransform(){
+        return m_trf;
+    }
     NodePtr GetParent() const;
     glm::mat4 GetMatrix() const;
     glm::mat4 GetModelMatrix();
