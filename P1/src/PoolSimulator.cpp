@@ -84,9 +84,9 @@ void PoolSimulator::setupContainer()
 
 void PoolSimulator::setupBalls()
 {
-    std::map<Ball*, NodePtr> ballNodeMap;
+    std::map<Ball*, TransformPtr> ballNodeMap;
 
-    int numBalls = 100;
+    int numBalls = 150;
     float radius = 0.5f;
 
     for (int i = 0; i < numBalls; ++i)
@@ -110,12 +110,12 @@ void PoolSimulator::setupBalls()
 
         m_container->AddNode(node);
 
-        ballNodeMap[ball.release()] = node;
+        ballNodeMap[ball.release()] = ballTransform;
     }
 
-    glm::vec3 leftWallPos(-width/2, 0.0f, 0.0f);
-    glm::vec3 rightWallPos(width/2, 0.0f, 0.0f);
-    glm::vec3 floorPos(0.0f, -8.0f, 0.0f);
+    glm::vec3 leftWallPos(-width/2 + 0.3, 0.0f, 0.0f);
+    glm::vec3 rightWallPos(width/2 - 0.3, 0.0f, 0.0f);
+    glm::vec3 floorPos(0.0f, -8.0f + 0.25, 0.0f);
     m_engine = PoolEngine::Make(ballNodeMap, rightWallPos, leftWallPos, floorPos);
 }
 

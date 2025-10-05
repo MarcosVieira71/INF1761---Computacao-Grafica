@@ -3,7 +3,7 @@
 #include "Node.h"
 #include "Transform.h"
 
-EnginePtr PoolEngine::Make(std::map<Ball*, NodePtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
+EnginePtr PoolEngine::Make(std::map<Ball*, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
 {
     return EnginePtr(new PoolEngine(balls, rightWall, leftWall, floor));
 }
@@ -11,26 +11,24 @@ EnginePtr PoolEngine::Make(std::map<Ball*, NodePtr> balls, glm::vec3 rightWall, 
 
 void PoolEngine::Update(float dt)
 {
-    for(auto pair : _ballsMap){
-        applyForces(*pair.first);
+    for(auto [ball, transform] : _ballsMap){
+        applyForces(*ball);
     }
     
-    for(auto pair : _ballsMap){
-        verletIntegrate(*pair.first, dt);
+    for(auto [ball, transform] : _ballsMap){
+        verletIntegrate(*ball, dt);
     }
 
     checkBallCollisions();
 
-    for(auto pair : _ballsMap){
-        checkWallCollision(*pair.first);
+    for(auto [ball, transform] : _ballsMap){
+        checkWallCollision(*ball);
     }
 
-    for(auto [ball, node] : _ballsMap){
-        glm::vec3 pos = ball->position;
-        
-        
-        node->GetTransform()->LoadIdentity(); 
-        node->GetTransform()->Translate(pos.x, pos.y, pos.z); // apenas atualiza posição
+    for(auto [ball, transform] : _ballsMap){
+        const glm::vec3 pos = ball->position;
+        transform->LoadIdentity(); 
+        transform->Translate(pos.x, pos.y, pos.z); // apenas atualiza posição
     }
 }
 
@@ -95,7 +93,7 @@ void PoolEngine::checkWallCollision(Ball& ball)
 
 }
 
-PoolEngine::PoolEngine(std::map<Ball*, NodePtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
+PoolEngine::PoolEngine(std::map<Ball*, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
     : _ballsMap(balls), m_rightWall(rightWall), m_leftWall(leftWall), m_floor(floor)
 {
 }
