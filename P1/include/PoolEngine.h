@@ -12,7 +12,7 @@ class Ball;
 class PoolEngine : public Engine
 {
 private:
-    std::map<Ball*, TransformPtr> _ballsMap;
+    std::map<std::shared_ptr<Ball>, TransformPtr> _ballsMap;
     glm::vec3 m_rightWall;
     glm::vec3 m_leftWall;
     glm::vec3 m_floor;
@@ -22,11 +22,11 @@ private:
     void checkWallCollision(Ball& ball);
     void checkBallCollisions();
 
-    PoolEngine(std::map<Ball*, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor);
+    PoolEngine(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor);
 
 public:
     void Update(float dt) override;
-    static EnginePtr Make(std::map<Ball*, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor);
+    static EnginePtr Make(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor);
     ~PoolEngine();
 };
 

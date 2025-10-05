@@ -84,7 +84,7 @@ void PoolSimulator::setupContainer()
 
 void PoolSimulator::setupBalls()
 {
-    std::map<Ball*, TransformPtr> ballNodeMap;
+    std::map<std::shared_ptr<Ball>, TransformPtr> ballNodeMap;
 
     int numBalls = 150;
     float radius = 0.5f;
@@ -96,7 +96,7 @@ void PoolSimulator::setupBalls()
         float z = 0.0f;
         glm::vec3 pos(x, y, z);
 
-        std::unique_ptr<Ball> ball = std::make_unique<Ball>(pos, radius);
+        std::shared_ptr<Ball> ball = std::make_shared<Ball>(pos, radius);
 
         auto ballTransform = Transform::Make();
         ballTransform->Translate(x, y, z);
@@ -110,7 +110,7 @@ void PoolSimulator::setupBalls()
 
         m_container->AddNode(node);
 
-        ballNodeMap[ball.release()] = ballTransform;
+        ballNodeMap[ball] = ballTransform;
     }
 
     glm::vec3 leftWallPos(-width/2 + 0.3, 0.0f, 0.0f);

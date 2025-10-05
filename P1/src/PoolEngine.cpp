@@ -3,7 +3,7 @@
 #include "Node.h"
 #include "Transform.h"
 
-EnginePtr PoolEngine::Make(std::map<Ball*, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
+EnginePtr PoolEngine::Make(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
 {
     return EnginePtr(new PoolEngine(balls, rightWall, leftWall, floor));
 }
@@ -51,10 +51,10 @@ void PoolEngine::checkBallCollisions()
 {
     for (auto it1 = _ballsMap.begin(); it1 != _ballsMap.end(); it1++)
     {
-        Ball* ball1 = it1->first;
+        auto ball1 = it1->first;
         for (auto it2 = std::next(it1); it2 != _ballsMap.end(); it2++)
         {
-            Ball* ball2 = it2->first;
+            auto ball2 = it2->first;
 
             glm::vec3 delta = ball2->position - ball1->position;
             float dist = glm::length(delta);
@@ -93,14 +93,12 @@ void PoolEngine::checkWallCollision(Ball& ball)
 
 }
 
-PoolEngine::PoolEngine(std::map<Ball*, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
+PoolEngine::PoolEngine(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor)
     : _ballsMap(balls), m_rightWall(rightWall), m_leftWall(leftWall), m_floor(floor)
 {
 }
 
 PoolEngine::~PoolEngine()
 {
-    for(auto pair : _ballsMap){
-        delete pair.first;
-    }
+
 }
