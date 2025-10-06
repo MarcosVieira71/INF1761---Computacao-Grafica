@@ -9,19 +9,23 @@
 #include "Shader.h"
 #include "Scene.h"
 #include "Camera2D.h"
+#include "Light.h"
+#include "Texture.h"
 #include "PoolEngine.h"
 
 #include <map>
 #include <vector>
 
 
-PoolSimulator::PoolSimulator()
+PoolSimulator::PoolSimulator() : 
+    m_ballTex(Texture::Make("decal", "../textures/golden_ball.png")),
+    m_containerTex(Texture::Make("decal", "../textures/silver.jpg"))
+
 {
     setupShader();
     setupContainer();
     setupBalls();
     setupScene();
-
 }
 
 
@@ -29,9 +33,18 @@ PoolSimulator::~PoolSimulator()
 {
 }
 
+void PoolSimulator::setupLight()
+{
+    m_light = Light::Make(0.0f, 0.0f, 5.0f, 1.0f);
+    m_light->SetAmbient(1.0f, 1.0f, 1.0f);
+    m_light->SetDiffuse(1.0f, 1.0f, 1.0f);
+    m_light->SetSpecular(1.0f, 1.0f, 1.0f);
+}
+
 void PoolSimulator::setupShader()
 {
-    m_shader = Shader::Make();
+    setupLight();
+    m_shader = Shader::Make(m_light, "world");
     m_shader->AttachVertexShader("../shaders/vertex.glsl");
     m_shader->AttachFragmentShader("../shaders/fragment.glsl");
     m_shader->Link();
@@ -42,11 +55,11 @@ void PoolSimulator::setupContainer()
 {
     
     TransformPtr leftTransform = Transform::Make();
-    leftTransform->Translate(-width/2, 0.0f, 0.0f);
+    leftTransform->Translate(-m_width/2, 0.0f, 0.0f);
     leftTransform->Scale(0.03, 3.3, 1.0f);
 
     TransformPtr rightTransform = Transform::Make();
-    rightTransform->Translate(width/2, 0.0f, 0.0f);
+    rightTransform->Translate(m_width/2, 0.0f, 0.0f);
     rightTransform->Scale(0.03, 3.3, 1.0f);
 
     TransformPtr floorTransform = Transform::Make();
@@ -55,27 +68,27 @@ void PoolSimulator::setupContainer()
 
     NodePtr leftNode = Node::Builder()
                     .WithShader(m_shader)
-                    .AddShape(Rectangle::Make(width, height))
+                    .AddShape(Rectangle::Make(m_width, m_height))
                     .WithTransform(leftTransform)
-                    .AddAppearance(Color::Make(1,1,1))
                     .Build();
 
     NodePtr rightNode = Node::Builder()
                         .WithShader(m_shader)
-                        .AddShape(Rectangle::Make(width, height))
+                        .AddShape(Rectangle::Make(m_width, m_height))
                         .WithTransform(rightTransform)
-                        .AddAppearance(Color::Make(1,1,1))
                         .Build();
 
 
     NodePtr floor = Node::Builder()
                     .WithShader(m_shader)
-                    .AddShape(Rectangle::Make(width, height))
-                    .AddAppearance(Color::Make(1,1,1))
+                    .AddShape(Rectangle::Make(m_width, m_height))
                     .WithTransform(floorTransform)
                     .Build();
-    
+
+
     m_container = Node::Builder()
+                    .AddAppearance(Color::Make(1,1,1))
+                    .AddAppearance(m_containerTex)
                     .AddNode(floor)
                     .AddNode(rightNode)
                     .AddNode(leftNode)
@@ -86,13 +99,20 @@ void PoolSimulator::setupBalls()
 {
     std::map<std::shared_ptr<Ball>, TransformPtr> ballNodeMap;
 
-    int numBalls = 150;
+    int numBalls = 200;
     float radius = 0.5f;
+    float minX = -m_width/2 + 0.3f + radius + 1.0f; // margem mínima da parede esquerda
+    float maxX = m_width/2 - 0.3f - radius - 1.0f;  // margem máxima da parede direita
+    m_balls = Node::Builder()
+                    .WithShader(m_shader)
+                    .AddAppearance(Color::Make(1,1,1))
+                    .AddAppearance(m_ballTex)
+                    .Build();
 
     for (int i = 0; i < numBalls; ++i)
     {
-        float x = -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f;
-        float y = 0.5f + i * (radius * 2.1f);
+        float x = minX + static_cast<float>(rand()) / RAND_MAX * (maxX - minX);
+        float y = radius + i * (radius * 2.1f); // garante que não comece no chão
         float z = 0.0f;
         glm::vec3 pos(x, y, z);
 
@@ -101,20 +121,19 @@ void PoolSimulator::setupBalls()
         auto ballTransform = Transform::Make();
         ballTransform->Translate(x, y, z);
 
-        NodePtr node = Node::Builder()
+        NodePtr balls = Node::Builder()
             .WithShader(m_shader)
             .AddShape(Disk::Make(radius, 64))
-            .AddAppearance(Color::Make(1,0,1))
             .WithTransform(ballTransform)
             .Build();
 
-        m_container->AddNode(node);
+        m_balls->AddNode(balls);
 
         ballNodeMap[ball] = ballTransform;
     }
 
-    glm::vec3 leftWallPos(-width/2 + 0.3, 0.0f, 0.0f);
-    glm::vec3 rightWallPos(width/2 - 0.3, 0.0f, 0.0f);
+    glm::vec3 leftWallPos(-m_width/2 + 0.3, 0.0f, 0.0f);
+    glm::vec3 rightWallPos(m_width/2 - 0.3, 0.0f, 0.0f);
     glm::vec3 floorPos(0.0f, -8.0f + 0.25, 0.0f);
     m_engine = PoolEngine::Make(ballNodeMap, rightWallPos, leftWallPos, floorPos);
 }
@@ -125,6 +144,7 @@ void PoolSimulator::setupScene()
 {
     m_root = Node::Builder()
             .WithShader(m_shader)
+            .AddNode(m_balls)
             .AddNode(m_container)
             .Build();
     

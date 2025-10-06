@@ -9,6 +9,7 @@ class Rectangle : public Shape {
 private:
     unsigned int m_vao;
     unsigned int m_vbo;
+    unsigned int m_tbo;
     unsigned int m_vertexNum;
 
 protected:

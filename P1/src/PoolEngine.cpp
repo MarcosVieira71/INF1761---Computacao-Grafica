@@ -34,10 +34,20 @@ void PoolEngine::Update(float dt)
 
 void PoolEngine::verletIntegrate(Ball& ball, float dt)
 {
+    float maxAccel = 50.0f;
+    ball.acceleration.x = glm::clamp(ball.acceleration.x, -maxAccel, maxAccel);
+    ball.acceleration.y = glm::clamp(ball.acceleration.y, -maxAccel, maxAccel);
+
+    glm::vec3 delta = ball.position - ball.last_position;
+    delta.z = 0.0f; 
+
     glm::vec3 temp = ball.position;
-    ball.position = ball.position + (ball.position - ball.last_position) + ball.acceleration * dt * dt;
+    ball.position += delta + ball.acceleration * dt * dt;
     ball.last_position = temp;
     ball.acceleration = glm::vec3(0.0f);
+
+    ball.position.z = 1.0f;
+    ball.last_position.z = 1.0f;
 }
 
 void PoolEngine::applyForces(Ball& ball)
@@ -49,10 +59,10 @@ void PoolEngine::applyForces(Ball& ball)
 
 void PoolEngine::checkBallCollisions()
 {
-    for (auto it1 = _ballsMap.begin(); it1 != _ballsMap.end(); it1++)
+    for (auto it1 = _ballsMap.begin(); it1 != _ballsMap.end(); ++it1)
     {
         auto ball1 = it1->first;
-        for (auto it2 = std::next(it1); it2 != _ballsMap.end(); it2++)
+        for (auto it2 = std::next(it1); it2 != _ballsMap.end(); ++it2)
         {
             auto ball2 = it2->first;
 
@@ -62,10 +72,13 @@ void PoolEngine::checkBallCollisions()
 
             if (penetration > 0.0f)
             {
-                glm::vec3 norm = delta / dist;
-
-                ball1->position -= 0.5f * penetration * norm;
-                ball2->position += 0.5f * penetration * norm;
+                glm::vec3 norm;
+                if (dist > 0.0001f)
+                    norm = delta / dist;
+                else
+                    norm = glm::vec3(1.0f, 0.0f, 0.0f); 
+                ball1->position -= 0.5f * penetration * norm * 0.9f;
+                ball2->position += 0.5f * penetration * norm * 0.9f;
             }
         }
     }
@@ -75,20 +88,25 @@ void PoolEngine::checkBallCollisions()
 void PoolEngine::checkWallCollision(Ball& ball)
 {
     float radius = ball.radius;
-
     if (ball.position.x - radius < m_leftWall.x)
     {
         ball.position.x = m_leftWall.x + radius;
+        // rebote com perda de energia para nao grudar
+        ball.last_position.x = ball.position.x + (ball.last_position.x - ball.position.x) * -0.9f; 
     }
 
     if (ball.position.x + radius > m_rightWall.x)
     {
         ball.position.x = m_rightWall.x - radius;
+        // rebote com perda de energia para nao grudar
+        ball.last_position.x = ball.position.x + (ball.last_position.x - ball.position.x) * -0.9f;
     }
 
     if (ball.position.y - radius < m_floor.y)
     {
         ball.position.y = m_floor.y + radius;
+        // rebote com perda de energia para nao grudar
+        ball.last_position.y = ball.position.y + (ball.last_position.y - ball.position.y) * -0.9f;
     }
 
 }

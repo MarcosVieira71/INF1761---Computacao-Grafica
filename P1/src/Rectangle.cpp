@@ -25,6 +25,13 @@ Rectangle::Rectangle(float width, float height)
         {-halfW,  halfH}
     };
 
+    std::vector<glm::vec2> texCoords = {
+        {0.0f, 0.0f},
+        {1.0f, 0.0f},
+        {1.0f, 1.0f},
+        {0.0f, 1.0f}
+    };
+
     m_vertexNum = static_cast<unsigned int>(vertices.size());
 
     glGenVertexArrays(1, &m_vao);
@@ -33,9 +40,14 @@ Rectangle::Rectangle(float width, float height)
     glGenBuffers(1, &m_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), vertices.data(), GL_STATIC_DRAW);
-
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
     glEnableVertexAttribArray(0);
+
+    glGenBuffers(1, &m_tbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_tbo);
+    glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(glm::vec2), texCoords.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0); 
+    glEnableVertexAttribArray(3);
 
     glBindVertexArray(0);
 }
