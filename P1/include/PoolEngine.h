@@ -13,20 +13,20 @@ class PoolEngine : public Engine
 {
 private:
     std::map<std::shared_ptr<Ball>, TransformPtr> _ballsMap;
-    glm::vec3 m_rightWall;
-    glm::vec3 m_leftWall;
-    glm::vec3 m_floor;
+    glm::vec2 m_rightWall;
+    glm::vec2 m_leftWall;
+    glm::vec2 m_floor;
 
     void verletIntegrate(Ball& ball, float dt);
     void applyForces(Ball& ball);
     void checkWallCollision(Ball& ball);
     void checkBallCollisions();
 
-    PoolEngine(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor);
+    PoolEngine(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec2 rightWall, glm::vec2 leftWall, glm::vec2 floor);
 
 public:
     void Update(float dt) override;
-    static EnginePtr Make(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec3 rightWall, glm::vec3 leftWall, glm::vec3 floor);
+    static EnginePtr Make(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec2 rightWall, glm::vec2 leftWall, glm::vec2 floor);
     ~PoolEngine();
 };
 

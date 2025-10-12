@@ -113,13 +113,13 @@ void PoolSimulator::setupBalls()
     {
         float x = minX + static_cast<float>(rand()) / RAND_MAX * (maxX - minX);
         float y = radius + i * (radius * 2.1f); // garante que não comece no chão
-        float z = 0.0f;
-        glm::vec3 pos(x, y, z);
+        
+        glm::vec2 pos(x, y);
 
         std::shared_ptr<Ball> ball = std::make_shared<Ball>(pos, radius);
 
         auto ballTransform = Transform::Make();
-        ballTransform->Translate(x, y, z);
+        ballTransform->Translate(x, y, 0);
 
         NodePtr balls = Node::Builder()
             .WithShader(m_shader)
@@ -132,9 +132,9 @@ void PoolSimulator::setupBalls()
         ballNodeMap[ball] = ballTransform;
     }
 
-    glm::vec3 leftWallPos(-m_width/2 + 0.3, 0.0f, 0.0f);
-    glm::vec3 rightWallPos(m_width/2 - 0.3, 0.0f, 0.0f);
-    glm::vec3 floorPos(0.0f, -8.0f + 0.25, 0.0f);
+    glm::vec2 leftWallPos(-m_width/2 + 0.3, 0.0f);
+    glm::vec2 rightWallPos(m_width/2 - 0.3, 0.0f);
+    glm::vec2 floorPos(0.0f, -8.0f + 0.25);
     m_engine = PoolEngine::Make(ballNodeMap, rightWallPos, leftWallPos, floorPos);
 }
 

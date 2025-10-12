@@ -10,11 +10,11 @@ using NodePtr = std::shared_ptr<Node>;
 struct Ball
 {
 
-    glm::vec3 position;
-    glm::vec3 last_position;
-    glm::vec3 acceleration;
+    glm::vec2 position;
+    glm::vec2 last_position;
+    glm::vec2 acceleration;
     float radius;
 
-    Ball(glm::vec3 pos0, float r);
+    Ball(glm::vec2 pos0, float r);
 };
 
