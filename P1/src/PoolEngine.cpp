@@ -68,15 +68,13 @@ void PoolEngine::checkBallCollisions()
 
             if (penetration > 0.0f)
             {
-                glm::vec2 norm = dist > 0.0001f ? delta / dist : glm::vec2(1.0f, 0.0f);
-
-                glm::vec2 correction = 0.5f * penetration * norm * 0.9f;
-                ball1->position -= correction;
-                ball2->position += correction;
-
-                float bounce = 0.9f;
-                ball1->last_position -= correction * bounce;
-                ball2->last_position += correction * bounce;
+                glm::vec2 norm;
+                if (dist > 0.0001f)
+                    norm = delta / dist;
+                else
+                    norm = glm::vec2(1.0f, 0.0f); 
+                ball1->position -= 0.5f * penetration * norm * 0.9f;
+                ball2->position += 0.5f * penetration * norm * 0.9f;
             }
         }
     }
@@ -111,7 +109,4 @@ PoolEngine::PoolEngine(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm:
 {
 }
 
-PoolEngine::~PoolEngine()
-{
-
-}
+PoolEngine::~PoolEngine() = default;
