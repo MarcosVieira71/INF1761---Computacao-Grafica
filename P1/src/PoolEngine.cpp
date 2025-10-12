@@ -34,7 +34,7 @@ void PoolEngine::Update(float dt)
 
 void PoolEngine::verletIntegrate(Ball& ball, float dt)
 {
-    float maxAccel = 50.0f;
+    float maxAccel = 30.0f;
     ball.acceleration.x = glm::clamp(ball.acceleration.x, -maxAccel, maxAccel);
     ball.acceleration.y = glm::clamp(ball.acceleration.y, -maxAccel, maxAccel);
 
@@ -43,7 +43,7 @@ void PoolEngine::verletIntegrate(Ball& ball, float dt)
     glm::vec2 temp = ball.position;
     ball.position += delta + ball.acceleration * dt * dt;
     ball.last_position = temp;
-    ball.acceleration = glm::vec3(0.0f);
+    ball.acceleration = glm::vec2(0.0f);
 }
 
 void PoolEngine::applyForces(Ball& ball)
@@ -101,8 +101,8 @@ void PoolEngine::checkWallCollision(Ball& ball)
         ball.position.y = m_floor.y + radius;
         ball.last_position.y = ball.position.y + (ball.last_position.y - ball.position.y) * -0.9f;
     }
-
 }
+
 
 PoolEngine::PoolEngine(std::map<std::shared_ptr<Ball>, TransformPtr> balls, glm::vec2 rightWall, glm::vec2 leftWall, glm::vec2 floor)
     : _ballsMap(balls), m_rightWall(rightWall), m_leftWall(leftWall), m_floor(floor)
