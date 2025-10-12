@@ -34,7 +34,7 @@ void PoolEngine::Update(float dt)
 
 void PoolEngine::verletIntegrate(Ball& ball, float dt)
 {
-    float maxAccel = 30.0f;
+    float maxAccel = 55.0f;
     ball.acceleration.x = glm::clamp(ball.acceleration.x, -maxAccel, maxAccel);
     ball.acceleration.y = glm::clamp(ball.acceleration.y, -maxAccel, maxAccel);
 
@@ -43,6 +43,10 @@ void PoolEngine::verletIntegrate(Ball& ball, float dt)
     glm::vec2 temp = ball.position;
     ball.position += delta + ball.acceleration * dt * dt;
     ball.last_position = temp;
+
+    float damping = 0.995f;
+    glm::vec2 velocity = ball.position - ball.last_position;
+    ball.last_position = ball.position - velocity * damping;
     ball.acceleration = glm::vec2(0.0f);
 }
 
