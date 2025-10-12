@@ -23,11 +23,10 @@ PoolSimulator::PoolSimulator() :
 
 {
     setupShader();
-    setupContainer();
     setupBalls();
+    setupContainer();
     setupScene();
 }
-
 
 PoolSimulator::~PoolSimulator()
 {
@@ -50,7 +49,6 @@ void PoolSimulator::setupShader()
     m_shader->Link();
 }
 
-
 void PoolSimulator::setupContainer()
 {
     
@@ -63,36 +61,35 @@ void PoolSimulator::setupContainer()
     rightTransform->Scale(0.03, 3.3, 1.0f);
 
     TransformPtr floorTransform = Transform::Make();
-    floorTransform->Translate(0.0f, -8.0f, 0.0f); 
-    floorTransform->Scale(1.0f, 0.1f, 1.0f);  
+    floorTransform->Translate(0.0f, -8.0f, 0.0f);
+    floorTransform->Scale(1.0f, 0.1f, 1.0f);
 
     NodePtr leftNode = Node::Builder()
-                    .WithShader(m_shader)
-                    .AddShape(Rectangle::Make(m_width, m_height))
-                    .WithTransform(leftTransform)
-                    .Build();
+                           .WithShader(m_shader)
+                           .AddShape(Rectangle::Make(m_width, m_height))
+                           .WithTransform(leftTransform)
+                           .Build();
 
     NodePtr rightNode = Node::Builder()
-                        .WithShader(m_shader)
-                        .AddShape(Rectangle::Make(m_width, m_height))
-                        .WithTransform(rightTransform)
-                        .Build();
-
+                            .WithShader(m_shader)
+                            .AddShape(Rectangle::Make(m_width, m_height))
+                            .WithTransform(rightTransform)
+                            .Build();
 
     NodePtr floor = Node::Builder()
-                    .WithShader(m_shader)
-                    .AddShape(Rectangle::Make(m_width, m_height))
-                    .WithTransform(floorTransform)
-                    .Build();
-
+                        .WithShader(m_shader)
+                        .AddShape(Rectangle::Make(m_width, m_height))
+                        .WithTransform(floorTransform)
+                        .Build();
 
     m_container = Node::Builder()
-                    .AddAppearance(Color::Make(1,1,1))
-                    .AddAppearance(m_containerTex)
-                    .AddNode(floor)
-                    .AddNode(rightNode)
-                    .AddNode(leftNode)
-                    .Build();
+                      .AddAppearance(Color::Make(1, 1, 1))
+                      .AddAppearance(m_containerTex)
+                      .AddNode(floor)
+                      .AddNode(rightNode)
+                      .AddNode(leftNode)
+                      .AddNode(m_balls)
+                      .Build();
 }
 
 void PoolSimulator::setupBalls()
@@ -138,16 +135,13 @@ void PoolSimulator::setupBalls()
     m_engine = PoolEngine::Make(ballNodeMap, rightWallPos, leftWallPos, floorPos);
 }
 
-
-
 void PoolSimulator::setupScene()
 {
     m_root = Node::Builder()
-            .WithShader(m_shader)
-            .AddNode(m_balls)
-            .AddNode(m_container)
-            .Build();
-    
+                 .WithShader(m_shader)
+                 .AddNode(m_container)
+                 .Build();
+
     m_scene = Scene::Make(m_root);
     m_scene->AddEngine(m_engine);
     m_camera = Camera2D::Make(-10, 10, -10, 10);

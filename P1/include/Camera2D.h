@@ -16,7 +16,7 @@ class Camera2D : public Camera
 protected:
   Camera2D (float xmin, float xmax, float ymin, float ymax);
 public:
-  static Camera2DPtr Make (float xxmin, float xmax, float ymin, float ymax);
+  static Camera2DPtr Make (float xmin, float xmax, float ymin, float ymax);
   virtual ~Camera2D ();
   virtual glm::mat4 GetProjMatrix () const;
   virtual glm::mat4 GetViewMatrix () const;

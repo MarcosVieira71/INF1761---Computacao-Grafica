@@ -43,7 +43,7 @@ void PoolEngine::verletIntegrate(Ball& ball, float dt)
     glm::vec2 temp = ball.position;
     ball.position += delta + ball.acceleration * dt * dt;
     ball.last_position = temp;
-    ball.acceleration = glm::vec2(0.0f);
+    ball.acceleration = glm::vec3(0.0f);
 }
 
 void PoolEngine::applyForces(Ball& ball)
