@@ -28,7 +28,7 @@ void PoolEngine::Update(float dt)
     for(auto [ball, transform] : _ballsMap){
         const glm::vec2 pos = ball->position;
         transform->LoadIdentity(); 
-        transform->Translate(pos.x, pos.y, 0); // apenas atualiza posição
+        transform->Translate(pos.x, pos.y, 0);
     }
 }
 
@@ -77,8 +77,8 @@ void PoolEngine::checkBallCollisions()
                     norm = delta / dist;
                 else
                     norm = glm::vec2(1.0f, 0.0f); 
-                ball1->position -= 0.5f * penetration * norm * 0.9f;
-                ball2->position += 0.5f * penetration * norm * 0.9f;
+                ball1->position -= 0.5f * penetration * norm;
+                ball2->position += 0.5f * penetration * norm;
             }
         }
     }
@@ -91,19 +91,19 @@ void PoolEngine::checkWallCollision(Ball& ball)
     if (ball.position.x - radius < m_leftWall.x)
     {
         ball.position.x = m_leftWall.x + radius;
-        ball.last_position.x = ball.position.x + (ball.last_position.x - ball.position.x) * -0.9f; 
+        ball.last_position.x = ball.position.x; 
     }
 
     if (ball.position.x + radius > m_rightWall.x)
     {
         ball.position.x = m_rightWall.x - radius;
-        ball.last_position.x = ball.position.x + (ball.last_position.x - ball.position.x) * -0.9f;
+        ball.last_position.x = ball.position.x;
     }
 
     if (ball.position.y - radius < m_floor.y)
     {
         ball.position.y = m_floor.y + radius;
-        ball.last_position.y = ball.position.y + (ball.last_position.y - ball.position.y) * -0.9f;
+        ball.last_position.y = ball.position.y;
     }
 }
 
