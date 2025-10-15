@@ -44,7 +44,7 @@ void PoolEngine::verletIntegrate(Ball& ball, float dt)
     ball.position += delta + ball.acceleration * dt * dt;
     ball.last_position = temp;
 
-    float damping = 0.995f;
+    float damping = 0.999f;
     glm::vec2 velocity = ball.position - ball.last_position;
     ball.last_position = ball.position - velocity * damping;
     ball.acceleration = glm::vec2(0.0f);

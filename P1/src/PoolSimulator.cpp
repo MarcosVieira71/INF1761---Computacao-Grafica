@@ -18,7 +18,8 @@
 
 
 PoolSimulator::PoolSimulator() : 
-    m_ballTex(Texture::Make("decal", "../textures/golden_ball.png")),
+    m_ballTexGold(Texture::Make("decal", "../textures/golden_ball.png")),
+    m_ballTexBricks(Texture::Make("decal", "../textures/bricks.jpg")),
     m_containerTex(Texture::Make("decal", "../textures/silver.jpg"))
 
 {
@@ -103,7 +104,6 @@ void PoolSimulator::setupBalls()
     m_balls = Node::Builder()
                     .WithShader(m_shader)
                     .AddAppearance(Color::Make(1,1,1))
-                    .AddAppearance(m_ballTex)
                     .Build();
 
     for (int i = 0; i < numBalls; ++i)
@@ -117,10 +117,12 @@ void PoolSimulator::setupBalls()
 
         auto ballTransform = Transform::Make();
         ballTransform->Translate(x, y, 0);
-
+        auto app = i % 2 == 0 ? m_ballTexGold : m_ballTexBricks;
+        
         NodePtr balls = Node::Builder()
             .WithShader(m_shader)
             .AddShape(Disk::Make(radius, 64))
+            .AddAppearance(app)
             .WithTransform(ballTransform)
             .Build();
 

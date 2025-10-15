@@ -24,7 +24,8 @@ using TexturePtr = std::shared_ptr<Texture>;
 class PoolSimulator
 {
 private:
-    TexturePtr m_ballTex;
+    TexturePtr m_ballTexGold;
+    TexturePtr m_ballTexBricks;
     TexturePtr m_containerTex;
 
     LightPtr  m_light;
