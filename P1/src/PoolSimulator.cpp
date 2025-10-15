@@ -66,19 +66,16 @@ void PoolSimulator::setupContainer()
     floorTransform->Scale(1.0f, 0.1f, 1.0f);
 
     NodePtr leftNode = Node::Builder()
-                           .WithShader(m_shader)
                            .AddShape(Rectangle::Make(m_width, m_height))
                            .WithTransform(leftTransform)
                            .Build();
 
     NodePtr rightNode = Node::Builder()
-                            .WithShader(m_shader)
                             .AddShape(Rectangle::Make(m_width, m_height))
                             .WithTransform(rightTransform)
                             .Build();
 
     NodePtr floor = Node::Builder()
-                        .WithShader(m_shader)
                         .AddShape(Rectangle::Make(m_width, m_height))
                         .WithTransform(floorTransform)
                         .Build();
@@ -102,7 +99,6 @@ void PoolSimulator::setupBalls()
     float minX = -m_width/2 + 0.3f + radius + 1.0f; // margem mínima da parede esquerda
     float maxX = m_width/2 - 0.3f - radius - 1.0f;  // margem máxima da parede direita
     m_balls = Node::Builder()
-                    .WithShader(m_shader)
                     .AddAppearance(Color::Make(1,1,1))
                     .Build();
 
@@ -120,7 +116,6 @@ void PoolSimulator::setupBalls()
         auto app = i % 2 == 0 ? m_ballTexGold : m_ballTexBricks;
         
         NodePtr balls = Node::Builder()
-            .WithShader(m_shader)
             .AddShape(Disk::Make(radius, 64))
             .AddAppearance(app)
             .WithTransform(ballTransform)
