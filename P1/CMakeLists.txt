@@ -4,6 +4,8 @@ project(P1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/../commons ${CMAKE_BINARY_DIR}/commons_build)
+
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/external/glfw/include
@@ -16,6 +18,8 @@ file(GLOB SOURCES
 )
 
 add_executable(P1 ${SOURCES})
+
+target_link_libraries(P1 PRIVATE commons)
 
 if(WIN32)
     target_link_libraries(P1 PRIVATE glfw glew32 opengl32)
