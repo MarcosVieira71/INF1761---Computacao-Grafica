@@ -17,7 +17,7 @@ Table::Leg::Leg(const glm::vec3& relativePos, float height)
     auto trfCube = Transform::Make();
 
     trfCube->Translate(relativePos.x, relativePos.y, relativePos.z);
-    trfCube->Scale(0.1f, height, 0.1f);
+    trfCube->Scale(0.5f, height, 0.5f);
 
     AddShape(Cube::Make());
     SetTransform(trfCube);
@@ -44,7 +44,7 @@ Table::Table(const glm::vec3& pos) : _pos(pos)
     auto trfTable = Transform::Make();
     trfTable->Translate(pos.x, pos.y, pos.z);
     
-    AddShape(Cube::Make());
+    // AddShape(Cube::Make());
     AddAppearance(Color::Make(1.0f, 0.3f, 0.3f));
     SetTransform(trfTable);
 }
@@ -60,7 +60,7 @@ void Table::setup()
     AddNode(Table::Leg::Make(glm::vec3(2.0, -20, 2.0), 20));
     AddNode(Table::Leg::Make(glm::vec3(-2.0, -20, 2.0), 20));
     AddNode(Table::Leg::Make(glm::vec3(-2.0, -20, -2.0), 20));
-    AddNode(Table::Leg::Make(glm::vec3(2.0, -20, -0.4), 20));
+    AddNode(Table::Leg::Make(glm::vec3(2.0, -20, -2.0), 20));
 }
 
 
