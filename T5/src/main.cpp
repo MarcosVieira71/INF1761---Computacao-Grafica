@@ -5,8 +5,7 @@
 #include "Shader.h"
 #include "Color.h"
 #include "Transform.h"
-#include "Cube.h"
-#include "Sphere.h"
+#include "Table.h"
 #include "Light.h"
 #include "Cylinder.h"
 
@@ -17,6 +16,43 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+static Camera3DPtr g_camera = nullptr;
+static ArcballPtr g_arcball = nullptr;
+
+static void cursorpos(GLFWwindow* win, double x, double y);
+static void cursorinit(GLFWwindow* win, double x, double y);
+
+static void mousebutton(GLFWwindow* win, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		glfwSetCursorPosCallback(win, cursorinit);
+	}
+	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		glfwSetCursorPosCallback(win, nullptr);
+	}
+}
+
+static void cursorinit(GLFWwindow* win, double x, double y)
+{
+	int wn_w, wn_h, fb_w, fb_h;
+	glfwGetWindowSize(win, &wn_w, &wn_h);
+	glfwGetFramebufferSize(win, &fb_w, &fb_h);
+	double xf = x * double(fb_w) / double(wn_w);
+	double yf = (wn_h - y) * double(fb_h) / double(wn_h);
+	if (g_arcball) g_arcball->InitMouseMotion(int(xf), int(yf));
+	glfwSetCursorPosCallback(win, cursorpos);
+}
+
+static void cursorpos(GLFWwindow* win, double x, double y)
+{
+	int wn_w, wn_h, fb_w, fb_h;
+	glfwGetWindowSize(win, &wn_w, &wn_h);
+	glfwGetFramebufferSize(win, &fb_w, &fb_h);
+	double xf = x * double(fb_w) / double(wn_w);
+	double yf = (wn_h - y) * double(fb_h) / double(wn_h);
+	if (g_arcball) g_arcball->AccumulateMouseMotion(int(xf), int(yf));
+}
 
 
 
@@ -54,30 +90,11 @@ int main()
 	shader->AttachVertexShader("../shaders/vertex.glsl");
 	shader->AttachFragmentShader("../shaders/fragment.glsl");
 	shader->Link();
-
-	auto trfCube = Transform::Make();
-	trfCube->Translate(-1.0f, 0.0f, 0.0f);
-	trfCube->Scale(1.0f, 1.0f, 1.0f);
-
-	auto cube = Node::Builder()
-					.WithTransform(trfCube)
-					.AddAppearance(Color::Make(1.0f, 0.3f, 0.3f))
-					.AddShape(Cube::Make())
-					.Build();
-	auto trfSphere = Transform::Make();
-	trfSphere->Translate(1.5f, 0.5f, 0.0f);
-	trfSphere->Scale(0.8f, 0.8f, 0.8f);
-
-	auto sphere = Node::Builder()
-					  .WithTransform(trfSphere)
-					  .AddAppearance(Color::Make(0.3f, 1.0f, 0.3f))
-					  .AddShape(Cylinder::Make(1.0f, 2.0f, 32, true))
-					  .Build();
-
+    TablePtr table = Table::Make({0.0f, 0.f, 0.f});
+    table->setupLegs();
 	auto root = Node::Builder()
 					.WithShader(shader)
-					.AddNode(cube)
-					.AddNode(sphere)
+					.AddNode(table)
 					.Build();
 
 	auto scene = Scene::Make(root);
@@ -85,6 +102,10 @@ int main()
 	auto camera = Camera3D::Make(0.0f, 0.0f, 6.0f);
 	camera->SetCenter(0.0f, 0.0f, 0.0f);
 	camera->SetAngle(45.0f);
+
+	g_camera = camera;
+	g_arcball = camera->CreateArcball();
+	glfwSetMouseButtonCallback(window, mousebutton);
 
 	float t0 = float(glfwGetTime());
 	while (!glfwWindowShouldClose(window)) {
