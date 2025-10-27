@@ -11,8 +11,7 @@ using ArcballPtr = std::shared_ptr<Arcball>;
 class Arcball {
   int m_x0, m_y0;
   float m_distance;
-  glm::mat4 m_mat; // kept for backward compatibility; will be computed from m_rot and m_distance
-  glm::mat4 m_rot; // accumulated rotation
+  glm::mat4 m_mat;
 protected:
   Arcball (float distance);
 public:

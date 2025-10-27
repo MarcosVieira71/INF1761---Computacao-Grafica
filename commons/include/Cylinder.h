@@ -12,7 +12,7 @@ class Cylinder : public Shape {
   unsigned int m_vbo;
   unsigned int m_nbo;
   unsigned int m_tbo;
-  unsigned int m_vertexNum; // non-indexed vertex count
+  unsigned int m_vertexNum;
 protected:
   Cylinder(float radius, float height, int segments, bool caps=true);
 public:
