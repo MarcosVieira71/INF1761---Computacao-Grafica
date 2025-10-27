@@ -91,7 +91,7 @@ int main()
 	shader->AttachFragmentShader("../shaders/fragment.glsl");
 	shader->Link();
     TablePtr table = Table::Make({0.0f, 0.f, 0.f});
-    table->setupLegs();
+    table->setup();
 	auto root = Node::Builder()
 					.WithShader(shader)
 					.AddNode(table)
