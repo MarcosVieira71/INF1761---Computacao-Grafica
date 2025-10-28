@@ -8,6 +8,9 @@
 class Table;
 using TablePtr = std::shared_ptr<Table>;
 
+class Appearance;
+using AppearancePtr = std::shared_ptr<Appearance>;
+
 class Table : public Node
 {   
     private:
@@ -37,12 +40,12 @@ class Table : public Node
         };
 
 
-        Table(const glm::vec3& pos);
+        Table(const glm::vec3& pos, AppearancePtr app);
         void setup();
 
         ~Table();
 
     
-        static TablePtr Make(const glm::vec3& pos);
+        static TablePtr Make(const glm::vec3& pos, AppearancePtr app);
     
 };

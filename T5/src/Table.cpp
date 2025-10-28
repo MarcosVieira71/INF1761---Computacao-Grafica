@@ -39,19 +39,18 @@ Table::Top::Top(const glm::vec3& scale)
 }
 
 
-Table::Table(const glm::vec3& pos) : _pos(pos)
+Table::Table(const glm::vec3& pos, AppearancePtr app) : _pos(pos)
 {
     auto trfTable = Transform::Make();
     trfTable->Translate(pos.x, pos.y, pos.z);
     
-    // AddShape(Cube::Make());
-    AddAppearance(Color::Make(1.0f, 0.3f, 0.3f));
+    AddAppearance(app);
     SetTransform(trfTable);
 }
 
-TablePtr Table::Make(const glm::vec3& pos)
+TablePtr Table::Make(const glm::vec3& pos, AppearancePtr app)
 {
-    return std::make_shared<Table>(pos);
+    return std::make_shared<Table>(pos, app);
 }
 
 void Table::setup()

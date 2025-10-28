@@ -2,6 +2,7 @@
 
 in vec3 vFragPos;
 in vec3 vNormal;
+in vec2 vTexCoord;
 
 out vec4 outcolor;
 
@@ -11,6 +12,8 @@ uniform vec4 lamb;
 uniform vec4 ldif;
 uniform vec4 lspe;
 uniform vec4 cpos;
+uniform sampler2D decal;  
+uniform int hasTexture;
 
 void main() {
     vec3 N = normalize(vNormal);
@@ -23,7 +26,21 @@ void main() {
     vec3 ambient = lamb.rgb * color.rgb;
     vec3 diffuse = ldif.rgb * color.rgb * diff;
     vec3 specular = lspe.rgb * spec;
-    vec3 result = ambient + diffuse + specular;
+    
+    vec3 lighting = ambient + diffuse + specular;
+    
+    vec4 texColor = texture(decal, vTexCoord);
 
-    outcolor = vec4(result, color.a);
+    vec3 result;
+    float alpha;
+
+    if (hasTexture == 1) {
+        result = lighting * texColor.rgb;
+        alpha = color.a * texColor.a;
+    } else {
+        result = lighting;
+        alpha = color.a;
+    }
+
+    outcolor = vec4(result, color.a * texColor.a);
 }

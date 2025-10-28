@@ -8,6 +8,10 @@
 #include "Table.h"
 #include "Light.h"
 #include "Cylinder.h"
+#include "Base.h"
+#include "Orbit.h"
+#include "AstralBody.h"
+#include "Texture.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -63,7 +67,7 @@ int main()
 		return -1;
 	}
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "T5 - Simple 3D Scene", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(800, 600, "T5", nullptr, nullptr);
 	if (!window) {
 		std::cerr << "Failed to create GLFW window\n";
 		glfwTerminate();
@@ -90,8 +94,17 @@ int main()
 	shader->AttachVertexShader("../shaders/vertex.glsl");
 	shader->AttachFragmentShader("../shaders/fragment.glsl");
 	shader->Link();
-    TablePtr table = Table::Make({0.0f, 0.f, 0.f});
+    TablePtr table = Table::Make({0.0f, 0.0f, 0.0f}, Texture::Make("decal", "../textures/oak.jpg"));
+
     table->setup();
+	BasePtr  base = Base::Make(1,1,{0.0f, 0.6f, 0.0f}, {0.10f,1.0f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
+	table->AddNode(base);
+	
+	OrbitPtr orb = Orbit::Make();
+	AstralBodyPtr astro = AstralBody::Make({0.0f, 1.0f, 0.0f}, {0.75f,0.75f, 0.75f}, Texture::Make("decal", "../textures/sun.jpg"));
+
+	orb->setup(astro);
+	base->setup(orb);
 	auto root = Node::Builder()
 					.WithShader(shader)
 					.AddNode(table)
