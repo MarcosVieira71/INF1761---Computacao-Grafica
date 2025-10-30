@@ -18,15 +18,15 @@ public:
     struct Pivot : public Node 
     { 
         using PivotPtr = std::shared_ptr<Pivot>;
-        static PivotPtr Make(float radius, float height, const glm::vec3& scale, AppearancePtr app);
-        Pivot(float radius, float height, const glm::vec3& scale, AppearancePtr app);
+        static PivotPtr Make(float radius, float height, const glm::vec3& scale);
+        Pivot(float radius, float height, const glm::vec3& scale);
         ~Pivot();
     };
 
     Pivot::PivotPtr _pivot;
     static BasePtr Make(float radius, float height, const glm::vec3& pos, const glm::vec3& scale, AppearancePtr app);
     Base(float radius, float height, const glm::vec3& pos, const glm::vec3& scale, AppearancePtr app);
-    void setup(OrbitPtr orb);
+    void setup(NodePtr orb);
 
     ~Base();
 };

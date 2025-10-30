@@ -46,6 +46,20 @@ void Transform::Rotate (float angle, float x, float y, float z)
 {
   m_mat = glm::rotate(m_mat,glm::radians(angle),glm::vec3(x,y,z));
 }
+
+void Transform::Translate (const glm::vec3& pos)
+{
+  return Transform::Translate(pos.x, pos.y, pos.z);
+}
+void Transform::Scale (const glm::vec3& scale)
+{
+  return Transform::Scale(scale.x, scale.y, scale.z);
+}
+
+void Transform::Rotate (float angle, const glm::vec3& rotation)
+{
+  return Transform::Rotate(angle, rotation.x, rotation.y, rotation.z);
+}
 const glm::mat4& Transform::GetMatrix() const
 {
   return m_mat;

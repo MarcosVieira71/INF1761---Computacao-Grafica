@@ -22,6 +22,9 @@ public:
   void Translate (float x, float y, float z);
   void Scale (float x, float y, float z);
   void Rotate (float angle, float x, float y, float z);
+  void Translate (const glm::vec3& pos);
+  void Scale (const glm::vec3& scale);
+  void Rotate (float angle, const glm::vec3& rotation);
   const glm::mat4& GetMatrix () const;
   void Load (StatePtr st) const;
   void Unload (StatePtr st) const;
