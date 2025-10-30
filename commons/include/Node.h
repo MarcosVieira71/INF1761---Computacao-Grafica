@@ -62,5 +62,6 @@ public:
     NodePtr GetParent() const;
     glm::mat4 GetMatrix() const;
     glm::mat4 GetModelMatrix();
+    TransformPtr& GetTransform();
     void Render(StatePtr st);
 };

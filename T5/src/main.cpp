@@ -13,6 +13,7 @@
 #include "MoonGlobe.h"
 #include "AstralBody.h"
 #include "Texture.h"
+#include "AstralEngine.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -101,13 +102,20 @@ int main()
 	BasePtr  base = Base::Make(1,1,{0.0f, 0.6f, 0.0f}, {0.10f,1.0f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
 	table->AddNode(base);
 	
-	OrbitPtr orb = Orbit::Make();
-	AstralBodyPtr astro = AstralBody::Make({0.0f, 1.0f, 0.0f}, {0.75f,0.75f, 0.75f}, Texture::Make("decal", "../textures/sun.jpg"));
+	OrbitPtr orbSun = Orbit::Make();
+	AstralBodyPtr astroSun = AstralBody::Make({0.0f, 1.0f, 0.0f}, {0.75f,0.75f, 0.75f}, Texture::Make("decal", "../textures/sun.jpg"));
+
+
+	OrbitPtr orbEarth = Orbit::Make();
+	AstralBodyPtr astroEarth = AstralBody::Make({2.0f, 0.0f, 0.0f}, {0.5f,0.5f, 0.5f}, Texture::Make("decal", "../textures/earth.jpg"));
 
 	MoonGlobePtr globe = MoonGlobe::Make({-2.0f, 1.0f, 2.0f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
 
-	orb->setup(astro);
-	base->setup(orb);
+	orbSun->setup(astroSun);
+	astroSun->setup(orbEarth);
+	orbEarth->setup(astroEarth);
+
+	base->setup(orbSun);
 	base->setup(globe);
 
 	auto root = Node::Builder()
@@ -116,6 +124,13 @@ int main()
 					.Build();
 
 	auto scene = Scene::Make(root);
+
+	AstralEnginePtr engine = AstralEngine::Make();
+
+	engine->addAxis(astroEarth, 30);
+	engine->addOrbit(orbEarth, 30);
+
+	scene->AddEngine(engine);
 
 	auto camera = Camera3D::Make(0.0f, 0.0f, 6.0f);
 	camera->SetCenter(0.0f, 0.0f, 0.0f);

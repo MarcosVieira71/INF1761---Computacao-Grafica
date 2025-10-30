@@ -49,16 +49,16 @@ void Transform::Rotate (float angle, float x, float y, float z)
 
 void Transform::Translate (const glm::vec3& pos)
 {
-  return Transform::Translate(pos.x, pos.y, pos.z);
+  Translate(pos.x, pos.y, pos.z);
 }
 void Transform::Scale (const glm::vec3& scale)
 {
-  return Transform::Scale(scale.x, scale.y, scale.z);
+  Scale(scale.x, scale.y, scale.z);
 }
 
 void Transform::Rotate (float angle, const glm::vec3& rotation)
 {
-  return Transform::Rotate(angle, rotation.x, rotation.y, rotation.z);
+  Rotate(angle, rotation.x, rotation.y, rotation.z);
 }
 const glm::mat4& Transform::GetMatrix() const
 {

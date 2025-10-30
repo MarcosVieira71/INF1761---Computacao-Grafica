@@ -129,6 +129,7 @@ void Node::Render(StatePtr st) {
     Error::Check("end node render");
 }
 
-
-
-
+TransformPtr& Node::GetTransform()
+{
+    return m_trf;
+}

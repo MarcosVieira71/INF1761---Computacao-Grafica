@@ -20,4 +20,6 @@ public:
 
     static AstralBodyPtr Make(const glm::vec3& pos, const glm::vec3& scale, AppearancePtr app);
 
+    void setup(OrbitPtr astro);
+
 };

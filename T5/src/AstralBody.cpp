@@ -21,3 +21,8 @@ AstralBody::AstralBody(const glm::vec3& pos, const glm::vec3& scale, AppearanceP
 }
 
 AstralBody::~AstralBody() = default;
+
+void AstralBody::setup(OrbitPtr astro)
+{
+    AddNode(astro);
+}
