@@ -50,6 +50,6 @@ class Table : public Node
         ~Table();
 
     
-        static TablePtr Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs);
+        static TablePtr Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs = {});
     
 };
