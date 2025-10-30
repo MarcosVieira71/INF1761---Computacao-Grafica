@@ -1,26 +1,28 @@
 #include "Table.h"
 
+#include "Base.h"
 #include "Color.h"
 #include "Cube.h"
+#include "Cylinder.h"
 #include "Transform.h"
 
 
-Table::Leg::LegPtr Table::Leg::Make(const glm::vec3& pos, float height)
+Table::Leg::LegPtr Table::Leg::Make(const glm::vec3& pos, float height, ShapePtr s)
 {
-    return std::make_shared<Leg>(pos, height);
+    return std::make_shared<Leg>(pos, height, s);
 }
 
 Table::Leg::~Leg() = default;
 
-Table::Leg::Leg(const glm::vec3& relativePos, float height)
+Table::Leg::Leg(const glm::vec3& relativePos, float height, ShapePtr s)
 {
-    auto trfCube = Transform::Make();
+    auto trfLegs = Transform::Make();
 
-    trfCube->Translate(relativePos.x, relativePos.y, relativePos.z);
-    trfCube->Scale(0.5f, height, 0.5f);
+    trfLegs->Translate(relativePos.x, relativePos.y, relativePos.z);
+    trfLegs->Scale(0.5f, height, 0.5f);
 
-    AddShape(Cube::Make());
-    SetTransform(trfCube);
+    AddShape(s);
+    SetTransform(trfLegs);
 }
 
 Table::Top::TopPtr Table::Top::Make(const glm::vec3& scale)
@@ -48,18 +50,23 @@ Table::Table(const glm::vec3& pos, AppearancePtr app) : _pos(pos)
     SetTransform(trfTable);
 }
 
-TablePtr Table::Make(const glm::vec3& pos, AppearancePtr app)
+TablePtr Table::Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs = {})
 {
-    return std::make_shared<Table>(pos, app);
+    auto table = std::make_shared<Table>(pos, app);
+    table->AddNode(Table::Top::Make({5.0f, 0.2f, 5.0f}));
+    auto nLegsApp = Node::Builder().AddAppearance(legs).Build();
+    table->AddNode(nLegsApp);
+    ShapePtr s = Cylinder::Make(1,1,64);
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(2.0, -2.5f, 2.0), 5.0f, s));
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.5f, 2.0), 5.0f, s));
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.5f, -2.0), 5.0f, s));
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(2.0, -2.5f, -2.0), 5.0f, s));
+    return table;
 }
 
-void Table::setup()
+void Table::setup(BasePtr base)
 {
-    AddNode(Table::Top::Make({5.0f, 0.2f, 5.0f}));
-    AddNode(Table::Leg::Make(glm::vec3(2.0, -20, 2.0), 20));
-    AddNode(Table::Leg::Make(glm::vec3(-2.0, -20, 2.0), 20));
-    AddNode(Table::Leg::Make(glm::vec3(-2.0, -20, -2.0), 20));
-    AddNode(Table::Leg::Make(glm::vec3(2.0, -20, -2.0), 20));
+    AddNode(base);
 }
 
 

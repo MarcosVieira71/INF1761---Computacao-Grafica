@@ -96,27 +96,27 @@ int main()
 	shader->AttachVertexShader("../shaders/vertex.glsl");
 	shader->AttachFragmentShader("../shaders/fragment.glsl");
 	shader->Link();
-    TablePtr table = Table::Make({0.0f, 0.0f, 0.0f}, Texture::Make("decal", "../textures/oak.jpg"));
+    TablePtr table = Table::Make({0.0f, 0.0f, 0.0f}, Texture::Make("decal", "../textures/oak.jpg"), Texture::Make("decal", "../textures/metal.jpg"));
+	MoonGlobePtr globe = MoonGlobe::Make({-2.0f, 1.0f, 2.0f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
 
-    table->setup();
 	BasePtr  base = Base::Make(1,1,{0.0f, 0.6f, 0.0f}, {0.10f,1.0f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
-	table->AddNode(base);
+	base->setup(globe);
 	
 	OrbitPtr orbSun = Orbit::Make();
 	AstralBodyPtr astroSun = AstralBody::Make({0.0f, 1.0f, 0.0f}, {0.75f,0.75f, 0.75f}, Texture::Make("decal", "../textures/sun.jpg"));
 
+   	base->setup(orbSun);
 
 	OrbitPtr orbEarth = Orbit::Make();
 	AstralBodyPtr astroEarth = AstralBody::Make({2.0f, 0.0f, 0.0f}, {0.5f,0.5f, 0.5f}, Texture::Make("decal", "../textures/earth.jpg"));
 
-	MoonGlobePtr globe = MoonGlobe::Make({-2.0f, 1.0f, 2.0f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
 
 	orbSun->setup(astroSun);
 	astroSun->setup(orbEarth);
 	orbEarth->setup(astroEarth);
+	table->setup(base);
 
-	base->setup(orbSun);
-	base->setup(globe);
+
 
 	auto root = Node::Builder()
 					.WithShader(shader)

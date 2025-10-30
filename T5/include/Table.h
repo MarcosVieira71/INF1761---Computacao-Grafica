@@ -11,6 +11,10 @@ using TablePtr = std::shared_ptr<Table>;
 class Appearance;
 using AppearancePtr = std::shared_ptr<Appearance>;
 
+class Base;
+using BasePtr = std::shared_ptr<Base>;
+
+
 class Table : public Node
 {   
     private:
@@ -24,8 +28,8 @@ class Table : public Node
             public: 
                 using LegPtr = std::shared_ptr<Leg>;
 
-                static LegPtr Make(const glm::vec3& pos, float height);
-                Leg(const glm::vec3& pos, float height);
+                static LegPtr Make(const glm::vec3& pos, float height, ShapePtr s);
+                Leg(const glm::vec3& pos, float height, ShapePtr s);
                 ~Leg();
         };
 
@@ -41,11 +45,11 @@ class Table : public Node
 
 
         Table(const glm::vec3& pos, AppearancePtr app);
-        void setup();
+        void setup(BasePtr base);
 
         ~Table();
 
     
-        static TablePtr Make(const glm::vec3& pos, AppearancePtr app);
+        static TablePtr Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs);
     
 };
