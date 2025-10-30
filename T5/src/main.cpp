@@ -10,6 +10,7 @@
 #include "Cylinder.h"
 #include "Base.h"
 #include "Orbit.h"
+#include "MoonGlobe.h"
 #include "AstralBody.h"
 #include "Texture.h"
 
@@ -103,8 +104,12 @@ int main()
 	OrbitPtr orb = Orbit::Make();
 	AstralBodyPtr astro = AstralBody::Make({0.0f, 1.0f, 0.0f}, {0.75f,0.75f, 0.75f}, Texture::Make("decal", "../textures/sun.jpg"));
 
+	MoonGlobePtr globe = MoonGlobe::Make({-2.0f, 1.0f, 2.0f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
+
 	orb->setup(astro);
 	base->setup(orb);
+	base->setup(globe);
+
 	auto root = Node::Builder()
 					.WithShader(shader)
 					.AddNode(table)
