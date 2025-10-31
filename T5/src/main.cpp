@@ -14,6 +14,7 @@
 #include "AstralBody.h"
 #include "Texture.h"
 #include "AstralEngine.h"
+#include "Emissive.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -88,14 +89,17 @@ int main()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, 800, 600);
 
-	auto light = Light::Make(5.0f, 5.0f, 5.0f, 1.0f, "world");
-	light->SetAmbient(0.2f, 0.2f, 0.2f);
-	light->SetDiffuse(0.9f, 0.9f, 0.9f);
+	auto light = Light::Make(0.0f, 0.0f, 0.0f, 1.0f, "world");
+	light->SetAmbient(0.3f, 0.3f, 0.3f);
+	light->SetDiffuse(1.0f, 1.0f, 0.9f);
+	light->SetSpecular(1.0f, 1.0f, 0.9f);
 
 	auto shader = Shader::Make(light, "world");
 	shader->AttachVertexShader("../shaders/vertex.glsl");
 	shader->AttachFragmentShader("../shaders/fragment.glsl");
 	shader->Link();
+
+
     TablePtr table = Table::Make({0.0f, 0.0f, 0.0f}, Texture::Make("decal", "../textures/oak.jpg"), Texture::Make("decal", "../textures/metal.jpg"));
 	MoonGlobePtr globe = MoonGlobe::Make({-2.0f, 1.0f, 2.0f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
 
@@ -103,18 +107,21 @@ int main()
 	base->setup(globe);
 	
 	OrbitPtr orbSun = Orbit::Make();
-	AstralBodyPtr astroSun = AstralBody::Make({0.0f, 1.0f, 0.0f}, {0.75f,0.75f, 0.75f}, Texture::Make("decal", "../textures/sun.jpg"));
+	AstralBodyPtr astroSun = AstralBody::Make({0.0f, 1.0f, 0.0f}, {0.75f,0.75f, 0.75f}, {Texture::Make("decal", "../textures/sun.jpg"), 
+		Emissive::Make(1.0f, 1.0f, 1.0f)});
 
    	base->setup(orbSun);
 
 	OrbitPtr orbEarth = Orbit::Make();
-	AstralBodyPtr astroEarth = AstralBody::Make({2.0f, 0.0f, 0.0f}, {0.5f,0.5f, 0.5f}, Texture::Make("decal", "../textures/earth.jpg"));
+	AstralBodyPtr astroEarth = AstralBody::Make({4.0f, 0.0f, 0.0f}, {0.5f, -0.5f, 0.5f}, {Texture::Make("decal", "../textures/earth.jpg"), Emissive::Make(0.05f, 0.05f, 0.1f)});
 
 
 	orbSun->setup(astroSun);
 	astroSun->setup(orbEarth);
 	orbEarth->setup(astroEarth);
 	table->setup(base);
+
+	light->SetReference(astroSun);
 
 
 

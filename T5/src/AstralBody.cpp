@@ -5,19 +5,21 @@
 #include "Transform.h"
 #include "Appearance.h"
 
-AstralBodyPtr AstralBody::Make(const glm::vec3& pos, const glm::vec3& scale, AppearancePtr app)
+AstralBodyPtr AstralBody::Make(const glm::vec3& pos, const glm::vec3& scale, const std::vector<AppearancePtr>& apps)
 {
-    return std::make_shared<AstralBody>(pos, scale, app);
+    return std::make_shared<AstralBody>(pos, scale, apps);
 }
 
-AstralBody::AstralBody(const glm::vec3& pos, const glm::vec3& scale, AppearancePtr app)
+AstralBody::AstralBody(const glm::vec3& pos, const glm::vec3& scale, const std::vector<AppearancePtr>& apps)
 {
     auto t = Transform::Make();
     t->Translate(pos.x, pos.y, pos.z);
     t->Scale(scale.x, scale.y, scale.z);
     AddShape(Sphere::Make(64, 64));
     SetTransform(t);
-    AddAppearance(app);
+    for(auto app : apps){
+        AddAppearance(app);
+    }
 }
 
 AstralBody::~AstralBody() = default;

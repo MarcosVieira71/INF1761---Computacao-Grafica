@@ -15,10 +15,10 @@ class AstralBody : public Node
 {   
 public:
 
-    AstralBody(const glm::vec3& pos, const glm::vec3& scale, AppearancePtr app);
+    AstralBody(const glm::vec3& pos, const glm::vec3& scale, const std::vector<AppearancePtr>& apps);
     ~AstralBody();
 
-    static AstralBodyPtr Make(const glm::vec3& pos, const glm::vec3& scale, AppearancePtr app);
+    static AstralBodyPtr Make(const glm::vec3& pos, const glm::vec3& scale, const std::vector<AppearancePtr>& apps);
 
     void setup(OrbitPtr astro);
 
