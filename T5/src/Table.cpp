@@ -45,7 +45,7 @@ Table::Table(const glm::vec3& pos, AppearancePtr app) : _pos(pos)
 {
     auto trfTable = Transform::Make();
     trfTable->Translate(pos.x, pos.y, pos.z);
-    
+    AddAppearance(Color::Make(1.0f, 1.0f, 1.0f));
     AddAppearance(app);
     SetTransform(trfTable);
 }
@@ -55,6 +55,7 @@ TablePtr Table::Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs
     auto table = std::make_shared<Table>(pos, app);
     table->AddNode(Table::Top::Make({5.0f, 0.2f, 5.0f}));
     if(!legs) legs = app;
+    
     auto nLegsApp = Node::Builder().AddAppearance(legs).Build();
     table->AddNode(nLegsApp);
     ShapePtr s = Cylinder::Make(1,1,64);

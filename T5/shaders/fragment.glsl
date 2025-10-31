@@ -29,12 +29,12 @@ void main() {
     
     vec3 lighting = ambient + diffuse + specular;
     
-    vec4 texColor = texture(decal, vTexCoord);
 
     vec3 result;
     float alpha;
 
     if (hasTexture == 1) {
+        vec4 texColor = texture(decal, vTexCoord);
         result = lighting * texColor.rgb;
         alpha = color.a * texColor.a;
     } else {
@@ -42,5 +42,5 @@ void main() {
         alpha = color.a;
     }
 
-    outcolor = vec4(result, color.a * texColor.a);
+    outcolor = vec4(result, alpha);
 }
