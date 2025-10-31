@@ -70,7 +70,7 @@ int main()
 		return -1;
 	}
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "T5", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(1600, 900, "T5", nullptr, nullptr);
 	if (!window) {
 		std::cerr << "Failed to create GLFW window\n";
 		glfwTerminate();
@@ -87,7 +87,7 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, 1600, 900);
 
 	auto light = Light::Make(0.0f, 0.0f, 0.0f, 1.0f, "world");
 	light->SetAmbient(0.3f, 0.3f, 0.3f);
@@ -113,7 +113,7 @@ int main()
    	base->setup(orbSun);
 
 	OrbitPtr orbEarth = Orbit::Make();
-	AstralBodyPtr astroEarth = AstralBody::Make({4.0f, 0.0f, 0.0f}, {0.5f, -0.5f, 0.5f}, {Texture::Make("decal", "../textures/earth.jpg"), Emissive::Make(0.05f, 0.05f, 0.1f)});
+	AstralBodyPtr astroEarth = AstralBody::Make({4.0f, 0.0f, 0.0f}, {0.5f, -0.5f, 0.5f}, {Texture::Make("decal", "../textures/earth.jpg"), Emissive::Make(0.0f, 0.0f, 0.0f)});
 
 
 	orbSun->setup(astroSun);

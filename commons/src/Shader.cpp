@@ -158,7 +158,12 @@ void Shader::ActiveTexture (const std::string& varname)
 
 void Shader::DeactiveTexture ()
 {
-  m_texunit--;
+  if (m_texunit > 0) {
+    m_texunit--;
+  }
+  if (m_texunit == 0) {
+    SetUniform("hasTexture", 0);
+  }
 }
 
 void Shader::Load (StatePtr st)
