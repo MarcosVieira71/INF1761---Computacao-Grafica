@@ -112,7 +112,7 @@ int main()
 	OrbitPtr orbSun = Orbit::Make();
 	AstralBodyPtr astroSun = AstralBody::Make(
 		{0.0f, 1.0f, 0.0f}, 
-		{64.0, 64.0, 64.0}, 
+		{128.0, 128.0, 128.0}, 
 		{
 			Texture::Make("decal", "../textures/sun.jpg"), 
 			Emissive::Make(1.0f, 1.0f, 1.0f)
@@ -139,6 +139,8 @@ int main()
 
 	int i = 0;
 	int k = 0;
+	auto nonEmissive = Emissive::Make(0.f, 0.f, 0.f);
+
 	for(const auto& planet : names)
 	{
 		i++;
@@ -147,8 +149,8 @@ int main()
 		const glm::vec3 pos = {1.f + i, 0.f, 0.f}; 
 
 		const std::vector<AppearancePtr> apps = {
-			Emissive::Make(0.f, 0.f, 0.f),
-			Texture::Make("decal", texturePath)
+			Texture::Make("decal", texturePath),
+			nonEmissive
 		};
 
 		const glm::vec3 scale = scales[k];
@@ -196,9 +198,10 @@ int main()
 
 	const auto& [orbit, astro] = ptr_map["earth"];
 	astro->setup(orbMoon);
+
 	engine->addAxis(astroMoon, 1.0f);
 	engine->addOrbit(orbMoon, 1.0f);
-
+	engine->addAxis(astroSun, 2.98f);
 
 
 		
@@ -212,10 +215,10 @@ int main()
 	scene->AddEngine(engine);
 
 
-	auto camera = Camera3D::Make(-600.0f, 0.0f, 0.0f);
+	auto camera = Camera3D::Make(-500.0f, -500.0f, -500.0f);
 	camera->SetCenter(0.0f, 0.0f, 0.0f);
 	camera->SetAngle(45.0f);
-	camera->SetZPlanes(1, 2500.0f);
+	camera->SetZPlanes(1, 2000.0f);
 
 	g_camera = camera;
 	g_arcball = camera->CreateArcball();
