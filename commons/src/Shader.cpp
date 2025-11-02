@@ -151,19 +151,13 @@ void Shader::SetUniform (const std::string& varname, const std::vector<glm::mat4
 void Shader::ActiveTexture (const std::string& varname)
 {
   SetUniform(varname,m_texunit);
-  SetUniform("hasTexture", 1);
   glActiveTexture(GL_TEXTURE0+m_texunit);
   m_texunit++;
 }
 
 void Shader::DeactiveTexture ()
 {
-  if (m_texunit > 0) {
-    m_texunit--;
-  }
-  if (m_texunit == 0) {
-    SetUniform("hasTexture", 0);
-  }
+  m_texunit--;
 }
 
 void Shader::Load (StatePtr st)

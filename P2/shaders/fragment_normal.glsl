@@ -2,6 +2,7 @@
 
 in vec3 vFragPos;
 in vec3 vNormal;
+in vec3 vTangent;
 in vec2 vTexCoord;
 
 out vec4 outcolor;
@@ -12,12 +13,21 @@ uniform vec4 lamb;
 uniform vec4 ldif;
 uniform vec4 lspe;
 uniform vec4 cpos;
-uniform sampler2D decal;  
+uniform sampler2D decal;
+uniform sampler2D normalMap;
 uniform int isEmissive;
 uniform vec3 emissionColor;
 
 void main() {
     vec3 N = normalize(vNormal);
+    vec3 T = normalize(vTangent);
+    vec3 B = normalize(cross(N, T));
+    mat3 TBN = mat3(T, B, N);
+
+    vec3 mapN = texture(normalMap, vTexCoord).rgb;
+    mapN = mapN * 2.0 - 1.0;
+    N = normalize(TBN * mapN);
+
     vec3 L = normalize(lpos.xyz - vFragPos);
     float diff = max(dot(N, L), 0.0);
     vec3 V = normalize(cpos.xyz - vFragPos);
@@ -38,6 +48,7 @@ void main() {
     vec4 texColor = texture(decal, vTexCoord);
     result = lighting * texColor.rgb;
     alpha = color.a * texColor.a;
+
 
     outcolor = vec4(result, alpha);
 }

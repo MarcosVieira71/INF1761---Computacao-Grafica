@@ -130,6 +130,11 @@ int main()
 	shader->AttachFragmentShader("../shaders/fragment.glsl");
 	shader->Link();
 
+	auto shaderNormal = Shader::Make(light, "world");
+	shaderNormal->AttachVertexShader("../shaders/vertex_normal.glsl");
+	shaderNormal->AttachFragmentShader("../shaders/fragment_normal.glsl");
+	shaderNormal->Link();
+
 	std::array<std::string, 8> names = {"mercury", "venus", "earth",
 										"mars", "jupiter", "saturn", "uranus", "neptune"};
 
@@ -141,7 +146,7 @@ int main()
 		{128.0, 128.0, 128.0},
 		{Texture::Make("decal", "../textures/sun.jpg"),
 		 Emissive::Make(1.0f, 1.0f, 1.0f)},
-		sphere);
+	sphere);
 
 	orbSun->setup(astroSun);
 
@@ -170,10 +175,15 @@ int main()
 
 		const glm::vec3 pos = {1.f + i, 0.f, 0.f};
 
-		const std::vector<AppearancePtr> apps = {
+		std::vector<AppearancePtr> apps = {
 			Texture::Make("decal", texturePath),
 			nonEmissive};
 
+		if(planet == "earth")
+		{
+			apps.push_back(Texture::Make("normalMap", "../textures/earth_normal.jpg" ));
+		}
+		
 		const glm::vec3 scale = scales[k];
 		auto astro = AstralBody::Make(std::move(pos), std::move(scale), std::move(apps), sphere);
 		auto orbit = Orbit::Make();
@@ -208,12 +218,15 @@ int main()
 		{2.0f, 0.0f, 0.0f},
 		{0.27f, 0.27f, 0.27f},
 		{Texture::Make("decal", "../textures/moon.jpg"),
-		 Emissive::Make(0.f, 0.f, 0.f)},
-		sphere);
+		Texture::Make("normalMap", "../textures/moon_normal.jpg"),
+		Emissive::Make(0.f, 0.f, 0.f)},
+	sphere);
+
 	orbMoon->setup(astroMoon);
 
-	const auto &[orbit, astro] = ptr_map["earth"];
-	astro->setup(orbMoon);
+	const auto &[orbit, astroEarth] = ptr_map["earth"];
+	astroEarth->setup(orbMoon);
+	astroEarth->SetShader(shaderNormal);
 
 	engine->addAxis(astroMoon, 1.0f);
 	engine->addOrbit(orbMoon, 1.0f);
@@ -232,7 +245,8 @@ int main()
 	cameraEarth->SetAngle(45.0f);
 	cameraEarth->SetZPlanes(0.1f, 2000.0f);
 	g_camera_earth = cameraEarth;
-	auto camEng = CameraEngine::Make(cameraEarth, astro, astroMoon, glm::vec3(0.0f, 2.0f, 6.0f));
+	auto camEng = CameraEngine::Make(cameraEarth, astroEarth, astroMoon, glm::vec3(0.0f, 2.0f, 6.0f));
+
 	scene->AddEngine(camEng);
 
 	auto camera = Camera3D::Make(-500.0f, -500.0f, -500.0f);
