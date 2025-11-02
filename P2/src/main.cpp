@@ -13,6 +13,7 @@
 #include "Texture.h"
 #include "AstralEngine.h"
 #include "Emissive.h"
+#include "CameraEngine.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -28,10 +29,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 static Camera3DPtr g_camera = nullptr;
+static Camera3DPtr g_camera_earth = nullptr;
+static Camera3DPtr g_active_camera = nullptr;
 static ArcballPtr g_arcball = nullptr;
 
 static void cursorpos(GLFWwindow *win, double x, double y);
 static void cursorinit(GLFWwindow *win, double x, double y);
+static void keycallback(GLFWwindow *win, int key, int scancode, int action, int mods);
 
 static void mousebutton(GLFWwindow *win, int button, int action, int mods)
 {
@@ -71,6 +75,20 @@ static void cursorpos(GLFWwindow *win, double x, double y)
 	double yf = (wn_h - y) * double(fb_h) / double(wn_h);
 	if (g_arcball)
 		g_arcball->AccumulateMouseMotion(int(xf), int(yf));
+}
+
+static void keycallback(GLFWwindow *win, int key, int scancode, int action, int mods)
+{
+	if (action != GLFW_PRESS) return;
+	if (key == GLFW_KEY_C) {
+		if (g_camera_earth && g_active_camera == g_camera) {
+			g_active_camera = g_camera_earth;
+		} else if (g_camera) {
+			g_active_camera = g_camera;
+		}
+		if (g_active_camera)
+			g_arcball = g_active_camera->GetArcball();
+	}
 }
 
 int main()
@@ -210,14 +228,23 @@ int main()
 
 	scene->AddEngine(engine);
 
+	auto cameraEarth = Camera3D::Make(0.0f, 0.0f, 0.0f);
+	cameraEarth->SetAngle(45.0f);
+	cameraEarth->SetZPlanes(0.1f, 2000.0f);
+	g_camera_earth = cameraEarth;
+	auto camEng = CameraEngine::Make(cameraEarth, astro, astroMoon, glm::vec3(0.0f, 2.0f, 6.0f));
+	scene->AddEngine(camEng);
+
 	auto camera = Camera3D::Make(-500.0f, -500.0f, -500.0f);
 	camera->SetCenter(0.0f, 0.0f, 0.0f);
 	camera->SetAngle(45.0f);
 	camera->SetZPlanes(1, 2000.0f);
 
 	g_camera = camera;
+	g_active_camera = camera;
 	g_arcball = camera->CreateArcball();
 	glfwSetMouseButtonCallback(window, mousebutton);
+	glfwSetKeyCallback(window, keycallback);
 
 	float t0 = float(glfwGetTime());
 	while (!glfwWindowShouldClose(window))
@@ -226,7 +253,7 @@ int main()
 		float t = float(glfwGetTime());
 		scene->Update(t - t0);
 		t0 = t;
-		scene->Render(camera);
+		scene->Render(g_active_camera);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
