@@ -31,12 +31,20 @@ void AsteroidBelt::Generate()
     float rMars = std::sqrt(marsPos.x * marsPos.x + marsPos.z * marsPos.z);
     float rJup = std::sqrt(jupPos.x * jupPos.x + jupPos.z * jupPos.z);
 
-    float innerR = std::min(rMars, rJup) + 0.1f;
-    float outerR = std::max(rMars, rJup) - 0.1f;
-    if (outerR <= innerR) {
-        innerR = rMars * 0.9f;
-        outerR = rJup * 1.1f;
-    }
+    float marsRadius = glm::length(mars->GetTransform()->GetMatrix()[0]);
+    float jupRadius  = glm::length(jupiter->GetTransform()->GetMatrix()[0]);
+
+    const float maxAsteroidRadius = 0.15f;
+    const float margin = 0.02f;
+
+    float innerCenter = rMars;
+    float outerCenter = rJup;
+
+    float innerPlanetRadius = marsRadius;
+    float outerPlanetRadius = jupRadius;
+
+    float innerR = innerCenter + innerPlanetRadius + maxAsteroidRadius + margin;
+    float outerR = outerCenter - (outerPlanetRadius + maxAsteroidRadius + margin);
 
     std::mt19937 rng(m_seed);
     std::uniform_real_distribution<float> U(0.0f, 1.0f);
@@ -54,16 +62,13 @@ void AsteroidBelt::Generate()
         float yoff = (U(rng) - 0.5f) * 0.05f * radius;
 
         glm::vec3 pos = {radius * std::cos(angle), yoff, radius * std::sin(angle)};
-        float base = 0.01f + U(rng) * 0.04f;
-
-        ShapePtr chosenShape;
+        
+        float base = 0.005f + U(rng) * 0.02f * 2.5f; // ~[0.005, 0.025]
         glm::vec3 scale;
-
-        chosenShape = sphere;
         scale = glm::vec3(
-            base * (0.3f + U(rng) * 2.2f),
-            base * (0.2f + U(rng) * 2.6f),
-            base * (0.4f + U(rng) * 2.0f)
+            base * (0.2f + U(rng) * 1.0f), 
+            base * (0.15f + U(rng) * 1.2f),
+            base * (0.25f + U(rng) * 0.8f)
         );
 
         pos += glm::vec3((U(rng) - 0.5f) * 0.02f * radius,
@@ -71,7 +76,7 @@ void AsteroidBelt::Generate()
                          (U(rng) - 0.5f) * 0.02f * radius);
 
         std::vector<AppearancePtr> apps = { tex1, tex2, m_nonEmissive };
-        auto asteroid = AstralBody::Make(pos, scale, apps, chosenShape);
+        auto asteroid = AstralBody::Make(pos, scale, apps, sphere);
         auto orb = Orbit::Make();
         orb->setup(asteroid);
         asteroid->SetShader(m_shaderNormal);
@@ -85,8 +90,8 @@ void AsteroidBelt::Generate()
 
         m_sun->setup(orb);
 
-        float spdOrbit = 5.0f + U(rng) * 10.0f;
-        float spdAxis = 10.0f + U(rng) * 30.0f;
+        float spdOrbit = 5.0f + 0.01 * 10.0f;
+        float spdAxis = 10.0f + 0.01 * 30.0f;
         m_engine->addOrbit(orb, spdOrbit);
         m_engine->addAxis(asteroid, spdAxis);
     }
