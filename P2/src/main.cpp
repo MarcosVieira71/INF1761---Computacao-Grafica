@@ -2,7 +2,10 @@
 #include "Arcball.h"
 #include "Scene.h"
 #include "Node.h"
+#include "SkyBox.h"
 #include "Shader.h"
+#include "Image.h"
+#include "Texcube.h"
 #include "Color.h"
 #include "Transform.h"
 #include "Light.h"
@@ -135,6 +138,11 @@ int main()
 	shaderNormal->AttachFragmentShader("../shaders/fragment_normal.glsl");
 	shaderNormal->Link();
 
+	auto skyShader = Shader::Make(light, "camera");
+	skyShader->AttachVertexShader("../shaders/sky_vertex.glsl");
+	skyShader->AttachFragmentShader("../shaders/sky_fragment.glsl");
+	skyShader->Link();
+
 	std::array<std::string, 8> names = {"mercury", "venus", "earth",
 										"mars", "jupiter", "saturn", "uranus", "neptune"};
 
@@ -232,8 +240,17 @@ int main()
 	engine->addOrbit(orbMoon, 1.0f);
 	engine->addAxis(astroSun, 2.98f);
 
+	auto skyApp = TexCube::Make("skybox", "../textures/cubemaps_skybox.png");
+
+	auto skyNode = Node::Builder()
+					   .WithShader(skyShader)
+					   .AddAppearance(skyApp)
+					   .AddShape(SkyBox::Make())
+					   .Build();
+
 	auto root = Node::Builder()
 					.WithShader(shader)
+					.AddNode(skyNode)
 					.AddNode(orbSun)
 					.Build();
 
