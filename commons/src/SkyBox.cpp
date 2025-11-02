@@ -86,8 +86,12 @@ void SkyBox::Draw(StatePtr st)
 
     glDepthMask(GL_FALSE);
 
+    glDepthFunc(GL_LEQUAL);
+
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glDepthFunc(GL_LESS);
 
     glDepthMask(GL_TRUE);
 

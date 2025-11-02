@@ -15,5 +15,6 @@ void main (void)
 {
   vTexCoord = coord;
   vColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-  gl_Position = Mvp * vec4(coord, 1.0); 
+  vec4 pos = Mvp * vec4(coord, 1.0);
+  gl_Position = vec4(pos.xy, pos.w, pos.w);
 }
