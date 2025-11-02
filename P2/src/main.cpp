@@ -236,11 +236,18 @@ int main()
 	astroEarth->setup(orbMoon);
 	astroEarth->SetShader(shaderNormal);
 
+	//Descomente isso para não ter TidalLock
 	engine->addAxis(astroMoon, 1.0f);
-	engine->addOrbit(orbMoon, 1.0f);
-	engine->addAxis(astroSun, 2.98f);
+	engine->addOrbit(orbMoon, 5.0f);	
+	
+	//Descomente isso para ter TidalLock
+	// engine->setEarth(astroEarth);
+	// engine->setMoon(astroMoon);
+	
+	//Obviamente, não se deve ter ambos descomentados ao mesmo tempo 
 
-	auto skyApp = TexCube::Make("skybox", "../textures/cubemaps_skybox.png");
+	engine->addAxis(astroSun, 2.98f);
+	auto skyApp = TexCube::Make("skybox", "../textures/space_cubemap.png");
 
 	auto skyNode = Node::Builder()
 					   .WithShader(skyShader)

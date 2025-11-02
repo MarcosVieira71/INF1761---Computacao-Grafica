@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine.h"
+#include "Node.h"
 #include "Transform.h"
 
 #include <glm/glm.hpp>
@@ -21,12 +22,16 @@ class AstralEngine : public Engine {
 
     std::map<TransformPtr, float> trfAstroMap;
     std::map<TransformPtr, float> trfOrbitMap;
+    NodePtr m_earth;
+    NodePtr m_moon;
 
 public:
     AstralEngine();
     void Update(float dt) override;
     void addOrbit(OrbitPtr orb, float speed);
     void addAxis(AstralBodyPtr astro, float speed);
+    void setEarth(NodePtr earth);
+    void setMoon(NodePtr moon);
     static AstralEnginePtr Make();
 
 };
