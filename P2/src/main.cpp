@@ -13,10 +13,12 @@
 #include "Orbit.h"
 #include "AstralBody.h"
 #include "Sphere.h"
+#include "Cube.h"
 #include "Texture.h"
 #include "AstralEngine.h"
 #include "Emissive.h"
 #include "CameraEngine.h"
+#include "AsteroidBelt.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -30,6 +32,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <random>
 
 static Camera3DPtr g_camera = nullptr;
 static Camera3DPtr g_camera_earth = nullptr;
@@ -220,6 +223,10 @@ int main()
 		engine->addAxis(astro, speedsAxis[j]);
 		engine->addOrbit(orbit, speedsOrbit[j]);
 	}
+
+	AsteroidBelt belt(engine, astroSun, ptr_map, shaderNormal, nonEmissive, 600, 123456);
+	belt.Generate();
+
 
 	OrbitPtr orbMoon = Orbit::Make();
 	AstralBodyPtr astroMoon = AstralBody::Make(
