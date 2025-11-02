@@ -35,9 +35,11 @@
 #include <random>
 
 static Camera3DPtr g_camera = nullptr;
-static Camera3DPtr g_camera_earth = nullptr;
+static Camera3DPtr g_camera_alternative = nullptr;
 static Camera3DPtr g_active_camera = nullptr;
+static CameraEnginePtr cameraEngine = nullptr;
 static ArcballPtr g_arcball = nullptr;
+std::map<std::string, std::tuple<OrbitPtr, AstralBodyPtr>> ptr_map;
 
 static void cursorpos(GLFWwindow *win, double x, double y);
 static void cursorinit(GLFWwindow *win, double x, double y);
@@ -86,15 +88,45 @@ static void cursorpos(GLFWwindow *win, double x, double y)
 static void keycallback(GLFWwindow *win, int key, int scancode, int action, int mods)
 {
 	if (action != GLFW_PRESS) return;
-	if (key == GLFW_KEY_C) {
-		if (g_camera_earth && g_active_camera == g_camera) {
-			g_active_camera = g_camera_earth;
-		} else if (g_camera) {
+	else{
+		if(g_camera_alternative && g_active_camera == g_camera){
+			g_active_camera = g_camera_alternative;
+		}
+		else if (g_camera) {
 			g_active_camera = g_camera;
 		}
 		if (g_active_camera)
 			g_arcball = g_active_camera->GetArcball();
+		if(cameraEngine){
+			AstralBodyPtr astObservable;
+			AstralBodyPtr astObserver;
+			if (key == GLFW_KEY_L) 
+			{
+				auto[orbObservable, moon] = ptr_map["moon"];
+				auto[orbObserver, earth] = ptr_map["earth"];	
+				astObservable = moon;
+				astObserver = earth;
+			}
+			if (key == GLFW_KEY_J) 
+			{
+				auto[orbObservable, mars] = ptr_map["mars"];
+				auto[orbObserver, jupiter] = ptr_map["jupiter"];	
+				astObservable = mars;
+				astObserver = jupiter;
+			}
+			if (key == GLFW_KEY_M) 
+			{
+				auto[orbObservable, jupiter] = ptr_map["jupiter"];
+				auto[orbObserver, mars] = ptr_map["mars"];	
+				astObservable = jupiter;
+				astObserver = mars;
+			}
+			cameraEngine->setObservable(astObservable);
+			cameraEngine->setObserver(astObserver);
+		}
+
 	}
+	
 }
 
 int main()
@@ -149,7 +181,7 @@ int main()
 	std::array<std::string, 8> names = {"mercury", "venus", "earth",
 										"mars", "jupiter", "saturn", "uranus", "neptune"};
 
-	ShapePtr sphere = Sphere::Make(64, 64);
+	ShapePtr sphere = Sphere::Make(32, 32);
 
 	OrbitPtr orbSun = Orbit::Make();
 	AstralBodyPtr astroSun = AstralBody::Make(
@@ -173,7 +205,6 @@ int main()
 
 	};
 
-	std::map<std::string, std::tuple<OrbitPtr, AstralBodyPtr>> ptr_map;
 
 	int i = 0;
 	int k = 0;
@@ -224,7 +255,7 @@ int main()
 		engine->addOrbit(orbit, speedsOrbit[j]);
 	}
 
-	AsteroidBelt belt(engine, astroSun, ptr_map, shaderNormal, nonEmissive, 600, 123456);
+	AsteroidBelt belt(engine, astroSun, ptr_map, shaderNormal, nonEmissive);
 	belt.Generate();
 
 
@@ -236,10 +267,12 @@ int main()
 		Texture::Make("normalMap", "../textures/moon_normal.jpg"),
 		Emissive::Make(0.f, 0.f, 0.f)},
 	sphere);
+	ptr_map["moon"] = {orbMoon, astroMoon};
 
 	orbMoon->setup(astroMoon);
 
 	const auto &[orbit, astroEarth] = ptr_map["earth"];
+
 	astroEarth->setup(orbMoon);
 	astroEarth->SetShader(shaderNormal);
 
@@ -272,18 +305,18 @@ int main()
 
 	scene->AddEngine(engine);
 
-	auto cameraEarth = Camera3D::Make(0.0f, 0.0f, 0.0f);
-	cameraEarth->SetAngle(45.0f);
-	cameraEarth->SetZPlanes(0.1f, 2000.0f);
-	g_camera_earth = cameraEarth;
-	auto camEng = CameraEngine::Make(cameraEarth, astroEarth, astroMoon, glm::vec3(0.0f, 2.0f, 6.0f));
+	auto cameraAlternative = Camera3D::Make(0.0f, 0.0f, 0.0f);
+	cameraAlternative->SetAngle(45.0f);
+	cameraAlternative->SetZPlanes(0.1f, 2000.0f);
+	g_camera_alternative = cameraAlternative;
+	cameraEngine = CameraEngine::Make(cameraAlternative, astroEarth, astroMoon, glm::vec3(0.0f, 2.0f, 6.0f));
 
-	scene->AddEngine(camEng);
+	scene->AddEngine(cameraEngine);
 
-	auto camera = Camera3D::Make(-500.0f, -500.0f, -500.0f);
+	auto camera = Camera3D::Make(-1000.0f, 750.0f, 500.0f);
 	camera->SetCenter(0.0f, 0.0f, 0.0f);
 	camera->SetAngle(45.0f);
-	camera->SetZPlanes(1, 2000.0f);
+	camera->SetZPlanes(1, 3000.0f);
 
 	g_camera = camera;
 	g_active_camera = camera;
@@ -292,6 +325,10 @@ int main()
 	glfwSetKeyCallback(window, keycallback);
 
 	float t0 = float(glfwGetTime());
+
+	double fpsLastTime = glfwGetTime();
+	int fpsFrames = 0;
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -301,6 +338,17 @@ int main()
 		scene->Render(g_active_camera);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		fpsFrames++;
+		double fpsNow = glfwGetTime();
+		double elapsed = fpsNow - fpsLastTime;
+		if (elapsed >= 1.0) {
+			double fps = double(fpsFrames) / elapsed;
+			std::string title = "Solar System - FPS: " + std::to_string(int(fps + 0.5));
+			glfwSetWindowTitle(window, title.c_str());
+			fpsFrames = 0;
+			fpsLastTime = fpsNow;
+		}
 	}
 
 	glfwDestroyWindow(window);

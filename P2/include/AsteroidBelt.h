@@ -16,7 +16,7 @@ public:
                  std::map<std::string, std::tuple<OrbitPtr, AstralBodyPtr>>& ptr_map,
                  ShaderPtr shaderNormal,
                  AppearancePtr nonEmissive,
-                 int count = 600,
+                 int count = 300,
                  unsigned int seed = 123456);
 
     void Generate();

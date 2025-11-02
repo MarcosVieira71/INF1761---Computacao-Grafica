@@ -49,10 +49,12 @@ void AsteroidBelt::Generate()
     std::mt19937 rng(m_seed);
     std::uniform_real_distribution<float> U(0.0f, 1.0f);
 
-    ShapePtr sphere = Sphere::Make(16, 16);
+    ShapePtr sphere = Sphere::Make(6, 6);
 
     auto tex1 = Texture::Make("decal", "../textures/asteroid.jpg");
     auto tex2 = Texture::Make("normalMap", "../textures/asteroid_normal.jpg");
+
+    std::vector<AppearancePtr> apps = { tex1, tex2, m_nonEmissive };
 
     for (int a = 0; a < m_count; ++a)
     {
@@ -63,7 +65,7 @@ void AsteroidBelt::Generate()
 
         glm::vec3 pos = {radius * std::cos(angle), yoff, radius * std::sin(angle)};
         
-        float base = 0.005f + U(rng) * 0.02f * 2.5f; // ~[0.005, 0.025]
+        float base = 0.005f + U(rng) * 0.02f * 2.5f;
         glm::vec3 scale;
         scale = glm::vec3(
             base * (0.2f + U(rng) * 1.0f), 
@@ -75,7 +77,6 @@ void AsteroidBelt::Generate()
                          (U(rng) - 0.5f) * 0.02f * radius,
                          (U(rng) - 0.5f) * 0.02f * radius);
 
-        std::vector<AppearancePtr> apps = { tex1, tex2, m_nonEmissive };
         auto asteroid = AstralBody::Make(pos, scale, apps, sphere);
         auto orb = Orbit::Make();
         orb->setup(asteroid);
