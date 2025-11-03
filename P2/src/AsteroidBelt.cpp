@@ -1,9 +1,12 @@
 #include "AsteroidBelt.h"
 
 #include "Sphere.h"
+#include "Sphere.h"
 #include "Texture.h"
 #include "Emissive.h"
 #include "Orbit.h"
+#include "Asteroid.h"
+#include "Node.h"
 
 #include <random>
 #include <glm/glm.hpp>
@@ -49,12 +52,18 @@ void AsteroidBelt::Generate()
     std::mt19937 rng(m_seed);
     std::uniform_real_distribution<float> U(0.0f, 1.0f);
 
-    ShapePtr sphere = Sphere::Make(6, 6);
+    ShapePtr sphere = Sphere::Make(8, 8);
 
     auto tex1 = Texture::Make("decal", "../textures/asteroid.jpg");
     auto tex2 = Texture::Make("normalMap", "../textures/asteroid_normal.jpg");
 
-    std::vector<AppearancePtr> apps = { tex1, tex2, m_nonEmissive };
+    auto asteroidContainer = Node::Builder()
+                                .WithShader(m_shaderNormal)
+                                .AddAppearance(tex1)
+                                .AddAppearance(tex2)
+                                .AddAppearance(m_nonEmissive)
+                                .Build();
+
     for (int a = 0; a < m_count; ++a)
     {
         float t = U(rng);
@@ -64,7 +73,7 @@ void AsteroidBelt::Generate()
 
         glm::vec3 pos = {radius * std::cos(angle), yoff, radius * std::sin(angle)};
         
-        float base = 0.005f + U(rng) * 0.02f * 2.5f;
+        float base = 0.005f + U(rng) * 0.02f * 3.0f;
         glm::vec3 scale;
         scale = glm::vec3(
             base * (0.2f + U(rng) * 1.0f), 
@@ -76,10 +85,11 @@ void AsteroidBelt::Generate()
                          (U(rng) - 0.5f) * 0.02f * radius,
                          (U(rng) - 0.5f) * 0.02f * radius);
 
-        auto asteroid = AstralBody::Make(pos, scale, apps, sphere);
+        auto asteroid = Asteroid::Make(pos, scale, sphere);
         auto orb = Orbit::Make();
         orb->setup(asteroid);
-        asteroid->SetShader(m_shaderNormal);
+
+        asteroidContainer->AddNode(orb);
 
         float rx = U(rng) * 360.0f;
         float ry = U(rng) * 360.0f;
@@ -88,11 +98,13 @@ void AsteroidBelt::Generate()
         asteroid->GetTransform()->Rotate(ry, 0.0f, 1.0f, 0.0f);
         asteroid->GetTransform()->Rotate(rz, 0.0f, 0.0f, 1.0f);
 
-        m_sun->setup(orb);
+
 
         float spdOrbit = 5.0f + 0.01 * 10.0f;
         float spdAxis = 10.0f + 0.01 * 30.0f;
         m_engine->addOrbit(orb, spdOrbit);
         m_engine->addAxis(asteroid, spdAxis);
     }
+
+    m_sun->AddNode(asteroidContainer);
 }
