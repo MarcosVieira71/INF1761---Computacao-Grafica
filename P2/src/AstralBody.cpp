@@ -45,7 +45,7 @@ void AstralBody::AddRing(const std::string& texturePath, float relativeScale, st
     AppearancePtr ringEmissive = Emissive::Make(0.6f, 0.6f, 0.6f);
 
     auto trf = Transform::Make();
-    trf->Rotate(90.0f, 1.0f, 0.0f, 0.0f);
+    trf->Rotate(88.9f, 1.0f, 0.0f, 0.0f);
     trf->Scale(relativeScale, relativeScale, relativeScale);
 
     auto ringNode = Node::Builder()

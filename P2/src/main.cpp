@@ -139,6 +139,15 @@ static void keycallback(GLFWwindow *win, int key, int scancode, int action, int 
 				astObserver = jupiter;
 			}
 			
+			if (key == GLFW_KEY_E) 
+			{
+				auto[orbObservable, earth] = ptr_map["earth"];
+				auto[orbObserver, venus] = ptr_map["venus"];	
+				astObservable = earth;
+				astObserver = venus;
+			}
+			
+
 
 			cameraEngine->setObservable(astObservable);
 			cameraEngine->setObserver(astObserver);
@@ -257,7 +266,7 @@ int main()
 
 		if(planet == "earth")
 		{
-			apps.push_back(Texture::Make("normalMap", "../textures/earth_normal.jpg" ));
+			apps.push_back(Texture::Make("normalMap", "../textures/earth-normal.png" ));
 		}
 		const glm::vec3 scale = scales[k];
 		auto astro = AstralBody::Make(std::move(pos), std::move(scale), std::move(apps), sphere);
@@ -313,12 +322,12 @@ int main()
 	astroEarth->SetShader(shaderNormal);
 
 	//Descomente isso para não ter TidalLock
-	engine->addAxis(astroMoon, 1.0f);
-	engine->addOrbit(orbMoon, 5.0f);	
+	// engine->addAxis(astroMoon, 1.0f);
+	// engine->addOrbit(orbMoon, 5.0f);	
 	
 	//Descomente isso para ter TidalLock
-	// engine->setEarth(astroEarth);
-	// engine->setMoon(astroMoon);
+	engine->setEarth(astroEarth);
+	engine->setMoon(astroMoon);
 	
 	//Obviamente, não se deve ter ambos descomentados ao mesmo tempo 
 
