@@ -11,6 +11,7 @@ class Disk : public Shape {
 private:
   unsigned int m_vao;
   unsigned int m_vbo;
+  unsigned int m_nbo;
   unsigned int m_tbo;
   unsigned int m_vertexNum;
 

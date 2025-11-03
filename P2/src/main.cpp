@@ -107,20 +107,39 @@ static void keycallback(GLFWwindow *win, int key, int scancode, int action, int 
 				astObservable = moon;
 				astObserver = earth;
 			}
-			if (key == GLFW_KEY_J) 
+			if (key == GLFW_KEY_M) 
 			{
 				auto[orbObservable, mars] = ptr_map["mars"];
 				auto[orbObserver, jupiter] = ptr_map["jupiter"];	
 				astObservable = mars;
 				astObserver = jupiter;
 			}
-			if (key == GLFW_KEY_M) 
+			if (key == GLFW_KEY_J) 
 			{
 				auto[orbObservable, jupiter] = ptr_map["jupiter"];
 				auto[orbObserver, mars] = ptr_map["mars"];	
 				astObservable = jupiter;
 				astObserver = mars;
 			}
+
+			if (key == GLFW_KEY_S) 
+			{
+				auto[orbObservable, saturn] = ptr_map["saturn"];
+				auto[orbObserver, jupiter] = ptr_map["jupiter"];	
+				astObservable = saturn;
+				astObserver = jupiter;
+			}
+
+			
+			if (key == GLFW_KEY_N) 
+			{
+				auto[orbObservable, neptune] = ptr_map["neptune"];
+				auto[orbObserver, jupiter] = ptr_map["jupiter"];	
+				astObservable = neptune;
+				astObserver = jupiter;
+			}
+			
+
 			cameraEngine->setObservable(astObservable);
 			cameraEngine->setObserver(astObserver);
 		}
@@ -155,6 +174,8 @@ int main()
 	}
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, 1600, 900);
 
@@ -202,7 +223,6 @@ int main()
 		glm::vec3{0.08f, 0.08f, 0.08f} * 5.0f,
 		glm::vec3{0.04f, 0.04f, 0.04f} * 10.0f,
 		glm::vec3{0.03f, 0.03f, 0.03f} * 10.0f
-
 	};
 
 
@@ -210,22 +230,35 @@ int main()
 	int k = 0;
 	auto nonEmissive = Emissive::Make(0.f, 0.f, 0.f);
 
+	static std::mt19937 rng{ std::random_device{}() };
+	std::uniform_real_distribution<float> distSmall(0.1f, 0.3f);
+	std::uniform_real_distribution<float> distLarge(0.3f, 0.8f);
+	float accumulated = 1.0f;
+
 	for (const auto &planet : names)
 	{
 		i++;
 		std::string texturePath = "../textures/" + planet + ".jpg";
 
-		const glm::vec3 pos = {1.f + i, 0.f, 0.f};
+		float baseDistance = 1.0f;
+		float randomOffset = (i <= 4) ? distSmall(rng) : distLarge(rng);
+		if (planet == "saturn")
+		{
+			randomOffset *= 3.0f;
+		}
+
+		accumulated += baseDistance + randomOffset;
+
+		glm::vec3 pos = {accumulated, 0.f, 0.f};
 
 		std::vector<AppearancePtr> apps = {
-			Texture::Make("decal", texturePath),
-			nonEmissive};
+		Texture::Make("decal", texturePath),
+		nonEmissive};
 
 		if(planet == "earth")
 		{
 			apps.push_back(Texture::Make("normalMap", "../textures/earth_normal.jpg" ));
 		}
-		
 		const glm::vec3 scale = scales[k];
 		auto astro = AstralBody::Make(std::move(pos), std::move(scale), std::move(apps), sphere);
 		auto orbit = Orbit::Make();
@@ -235,7 +268,6 @@ int main()
 		astroSun->setup(orbit);
 		k++;
 	}
-
 	AstralEnginePtr engine = AstralEngine::Make();
 
 	int j = 0;
@@ -271,6 +303,10 @@ int main()
 
 	orbMoon->setup(astroMoon);
 
+		
+	auto& [orbitSaturn, astroSaturn] = ptr_map["saturn"]; 
+	astroSaturn->AddRing("../textures/saturns_ring.png", 1.5f, 32);
+	
 	const auto &[orbit, astroEarth] = ptr_map["earth"];
 
 	astroEarth->setup(orbMoon);
@@ -307,9 +343,9 @@ int main()
 
 	auto cameraAlternative = Camera3D::Make(0.0f, 0.0f, 0.0f);
 	cameraAlternative->SetAngle(45.0f);
-	cameraAlternative->SetZPlanes(0.1f, 2000.0f);
+	cameraAlternative->SetZPlanes(0.1f, 3000.0f);
 	g_camera_alternative = cameraAlternative;
-	cameraEngine = CameraEngine::Make(cameraAlternative, astroEarth, astroMoon, glm::vec3(0.0f, 2.0f, 6.0f));
+	cameraEngine = CameraEngine::Make(cameraAlternative, astroEarth, astroMoon, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	scene->AddEngine(cameraEngine);
 

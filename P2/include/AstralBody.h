@@ -24,4 +24,6 @@ public:
 
     void setup(OrbitPtr astro);
 
+    void AddRing(const std::string& texturePath, float relativeScale = 2.0f, std::size_t segments = 128);
+
 };

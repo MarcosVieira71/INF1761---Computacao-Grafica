@@ -55,7 +55,6 @@ void AsteroidBelt::Generate()
     auto tex2 = Texture::Make("normalMap", "../textures/asteroid_normal.jpg");
 
     std::vector<AppearancePtr> apps = { tex1, tex2, m_nonEmissive };
-
     for (int a = 0; a < m_count; ++a)
     {
         float t = U(rng);
