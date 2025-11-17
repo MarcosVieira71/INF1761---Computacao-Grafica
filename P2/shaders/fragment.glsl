@@ -2,7 +2,8 @@
 
 in vec3 vFragPos;
 in vec3 vNormal;
-in vec2 vTexCoord;
+in vec2 vTexCoord; 
+in vec4 vShadowCoord;
 
 out vec4 outcolor;
 
@@ -12,9 +13,30 @@ uniform vec4 lamb;
 uniform vec4 ldif;
 uniform vec4 lspe;
 uniform vec4 cpos;
-uniform sampler2D decal;  
-uniform int isEmissive;
 uniform vec3 emissionColor;
+
+uniform int isEmissive;
+
+uniform sampler2D decal;  
+uniform sampler2DShadow shadowMap; 
+
+float getShadow(vec4 sc)
+{
+    vec3 proj = sc.xyz / sc.w;
+    proj = proj * 0.5 + 0.5;
+
+    if (proj.z > 1.0) return 1.0;
+
+    float shadow = 0.0;
+    float texel = 1.0 / 2048.0; 
+
+    for(int x = -1; x <= 1; x++)
+    for(int y = -1; y <= 1; y++)
+        shadow += texture(shadowMap, vec3(proj.xy + vec2(x,y) * texel, proj.z));
+
+    return shadow / 9.0;
+}
+
 
 void main() {
     vec3 N = normalize(vNormal);
@@ -30,7 +52,9 @@ void main() {
     vec3 diffuse = ldif.rgb * color.rgb * diff;
     vec3 specular = lspe.rgb * spec;
 
-    vec3 lighting = (ambient + diffuse + specular);
+    // float shadow = getShadow(vShadowCoord);
+
+    vec3 lighting = ambient + (diffuse + specular);
     if (isEmissive == 1) lighting += emissionColor;
     vec3 result;
     float alpha;

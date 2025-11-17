@@ -1,5 +1,15 @@
 #include "SolarSystemScene.h"
 
+#ifdef _WIN32
+    #include <glad/glad.h>
+#elif __APPLE__
+    #include <OpenGL/gl3.h>
+#else
+    #include <GL/glew.h>
+    #include <GL/gl.h>
+#endif
+
+
 #include "Camera3D.h"
 #include "Arcball.h"
 #include "Node.h"
@@ -22,6 +32,8 @@
 #include "AsteroidBelt.h"
 #include "SolarShaders.h"
 #include "PlanetBuilder.h"
+#include "Framebuffer.h"
+#include "TexDepth.h"
 
 #include <array>
 #include <random>
@@ -30,8 +42,7 @@
 SolarSystemScene::SolarSystemScene()
 {
     auto light = SolarShaders::CreateLight();
-    auto shaders = SolarShaders::CreateShaders(light);
-
+    _shaders = SolarShaders::CreateShaders(light);
     ShapePtr sphere = PlanetBuilder::CreateSphere();
     OrbitPtr orbSun = Orbit::Make();
     AstralBodyPtr astroSun = AstralBody::Make(
@@ -48,12 +59,12 @@ SolarSystemScene::SolarSystemScene()
     AstralEnginePtr engine = CreateEngines();
 
     auto nonEmissive = Emissive::Make(0.f, 0.f, 0.f);
-    AsteroidBelt belt(engine, astroSun, _ptr_map, shaders.normal, nonEmissive);
+    AsteroidBelt belt(engine, astroSun, _ptr_map, _shaders.normal, nonEmissive);
     belt.Generate();
 
-    PlanetBuilder::BuildMoonAndRings(_ptr_map, sphere, shaders.normal);
+    PlanetBuilder::BuildMoonAndRings(_ptr_map, sphere, _shaders.normal);
 
-    FinalizeScene(shaders.main, shaders.sky, orbSun, engine, sphere);
+    FinalizeScene(_shaders.main, _shaders.sky, orbSun, engine, sphere);
 }
 
 
@@ -90,6 +101,13 @@ void SolarSystemScene::FinalizeScene(const ShaderPtr &shader, const ShaderPtr &s
     _scene = Scene::Make(root);
     _scene->AddEngine(engine);
 
+	_shadowCamera = Camera3D::Make(0.0f, 1.0f, 0.0f);
+	_shadowCamera->SetUpDir(1.0f, 0.0f, 0.0f);
+	_shadowCamera->SetAngle(90.0f);
+    _shadowCamera->SetZPlanes(0.1f, 500.0f);
+    initShadowResources();
+
+    
     _cameraAlternative = Camera3D::Make(0.0f, 0.0f, 0.0f);
     _cameraAlternative->SetAngle(45.0f);
     _cameraAlternative->SetZPlanes(0.1f, 3000.0f);
@@ -139,4 +157,57 @@ const std::map<std::string, std::tuple<OrbitPtr, AstralBodyPtr>>& SolarSystemSce
 void SolarSystemScene::SetActiveCamera(const Camera3DPtr &c) 
 { 
     _activeCamera = c; 
+}
+
+void SolarSystemScene::Render(float dt)
+{
+    glViewport(0, 0, 1600, 900);
+
+    _scene->GetRoot()->SetShader(_shaders.main);
+    _scene->Update(dt);
+    _scene->Render(_activeCamera);
+}
+
+void SolarSystemScene::RenderShadow()
+{
+    _fbo->Bind();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, 1024, 1024);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(2.0f, 4.0f);
+
+    _scene->GetRoot()->SetShader(_shaders.shadow);
+    _scene->Render(_shadowCamera);
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glDisable(GL_CULL_FACE);
+    glFlush();
+    _fbo->Unbind();    
+}
+
+void SolarSystemScene::initShadowResources()
+{
+    _smap = TexDepth::Make("shadowMap", 4096, 4096);
+    _smap->SetCompareMode();
+    _fbo = Framebuffer::Make(_smap);
+
+    // glm::mat4 bias = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f))
+    //                * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+
+    for (const auto& [name, pair] : _ptr_map)
+    {
+        auto& [orbit, astro] = pair;
+        glm::mat4 modelMatrix = astro->GetTransform()->GetMatrix(); // posição, rotação, escala
+        glm::mat4 lightSpace =  _shadowCamera->GetProjMatrix()
+                                           * _shadowCamera->GetViewMatrix()
+                                           * modelMatrix;
+                                        //    * bias;
+
+        auto mtex = Variable<glm::mat4>::Make("Mtex",lightSpace);
+        astro->AddAppearance(mtex);
+    }
 }
