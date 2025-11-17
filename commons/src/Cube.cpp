@@ -176,7 +176,7 @@ Cube::Cube ()
   glEnableVertexAttribArray(2);
   // create tex coord buffer
   glBindBuffer(GL_ARRAY_BUFFER,id[3]);
-  glBufferData(GL_ARRAY_BUFFER,sizeof(normals),texcoords,GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER,sizeof(texcoords),texcoords,GL_STATIC_DRAW);
   glVertexAttribPointer(3,2,GL_FLOAT,GL_FALSE,0,0);
   glEnableVertexAttribArray(3);
   // create index buffer

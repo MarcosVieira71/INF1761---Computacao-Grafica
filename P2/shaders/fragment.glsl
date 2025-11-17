@@ -20,19 +20,19 @@ uniform int isEmissive;
 uniform sampler2D decal;  
 uniform sampler2DShadow shadowMap; 
 
-float getShadow(vec4 sc)
+float getShadow(vec4 sc, float bias)
 {
     vec3 proj = sc.xyz / sc.w;
     proj = proj * 0.5 + 0.5;
-
     if (proj.z > 1.0) return 1.0;
+    if (proj.x < 0.0 || proj.x > 1.0 || proj.y < 0.0 || proj.y > 1.0) return 1.0;
 
     float shadow = 0.0;
-    float texel = 1.0 / 2048.0; 
+    float texel = 1.0 / 512.0; 
 
     for(int x = -1; x <= 1; x++)
     for(int y = -1; y <= 1; y++)
-        shadow += texture(shadowMap, vec3(proj.xy + vec2(x,y) * texel, proj.z));
+        shadow += texture(shadowMap, vec3(proj.xy + vec2(x,y) * texel, proj.z - bias));
 
     return shadow / 9.0;
 }
@@ -46,22 +46,20 @@ void main() {
     vec3 R = reflect(-L, N);
     float spec = pow(max(dot(R, V), 0.0), 32.0);
 
-    float distance = length(lpos.xyz - vFragPos);
-
     vec3 ambient = lamb.rgb * color.rgb;
     vec3 diffuse = ldif.rgb * color.rgb * diff;
     vec3 specular = lspe.rgb * spec;
 
-    // float shadow = getShadow(vShadowCoord);
+    // compute bias and shadow factor (use slightly larger minimum bias to reduce acne)
+    float bias = max(0.001, 0.005 * (1.0 - max(dot(N, L), 0.0)));
+    float shadow = getShadow(vShadowCoord, bias);
 
-    vec3 lighting = ambient + (diffuse + specular);
+    vec3 lighting = ambient + (diffuse + specular) * shadow;
     if (isEmissive == 1) lighting += emissionColor;
-    vec3 result;
-    float alpha;
 
     vec4 texColor = texture(decal, vTexCoord);
-    result = lighting * texColor.rgb;
-    alpha = color.a * texColor.a;
+    vec3 result = lighting * texColor.rgb;
+    float alpha = color.a * texColor.a;
 
     outcolor = vec4(result, alpha);
 }

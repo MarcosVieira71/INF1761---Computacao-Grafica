@@ -101,10 +101,23 @@ void SolarSystemScene::FinalizeScene(const ShaderPtr &shader, const ShaderPtr &s
     _scene = Scene::Make(root);
     _scene->AddEngine(engine);
 
-	_shadowCamera = Camera3D::Make(0.0f, 1.0f, 0.0f);
-	_shadowCamera->SetUpDir(1.0f, 0.0f, 0.0f);
-	_shadowCamera->SetAngle(90.0f);
-    _shadowCamera->SetZPlanes(0.1f, 500.0f);
+    // place the shadow camera above the scene and use orthographic projection
+    // moved closer and increased angle to better cover the system
+    _shadowCamera = Camera3D::Make(0.0f, 200.0f, 0.0f);
+    _shadowCamera->SetUpDir(0.0f, 0.0f, 1.0f);
+    _shadowCamera->SetOrtho(true);
+    _shadowCamera->SetAngle(90.0f);
+    _shadowCamera->SetZPlanes(0.1f, 2000.0f);
+
+    // ensure the light used by shaders references the sun node so lpos is correct
+    if (_shaders.main && _shaders.main->GetLight()) {
+        _shaders.main->GetLight()->SetReference(std::get<1>(_ptr_map.at("sun")));
+    }
+    if (_shaders.normal && _shaders.normal->GetLight()) {
+        _shaders.normal->GetLight()->SetReference(std::get<1>(_ptr_map.at("sun")));
+    }
+
+
     initShadowResources();
 
     
@@ -163,6 +176,11 @@ void SolarSystemScene::Render(float dt)
 {
     glViewport(0, 0, 1600, 900);
 
+    if (_smap && !_smap_attached) {
+        _scene->GetRoot()->AddAppearance(_smap);
+        _smap_attached = true;
+    }
+
     _scene->GetRoot()->SetShader(_shaders.main);
     _scene->Update(dt);
     _scene->Render(_activeCamera);
@@ -172,15 +190,32 @@ void SolarSystemScene::RenderShadow()
 {
     _fbo->Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, 1024, 1024);
+    glViewport(0, 0, 512, 512);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(2.0f, 4.0f);
 
-    _scene->GetRoot()->SetShader(_shaders.shadow);
+    glm::mat4 viewMat = _shadowCamera->GetViewMatrix();
+    glm::mat4 projMat = _shadowCamera->GetProjMatrix();
+
+    for (const auto& [name, pair] : _ptr_map)
+    {
+        auto& [orbit, astro] = pair;
+        glm::mat4 modelMatrix = astro->GetModelMatrix();
+        glm::mat4 lightSpace = projMat * viewMat * modelMatrix;
+
+        auto it = _mtex_map.find(name);
+        if (it != _mtex_map.end()) {
+            it->second->SetValue(lightSpace);
+        }
+    }
+
     _scene->Render(_shadowCamera);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -191,23 +226,23 @@ void SolarSystemScene::RenderShadow()
 
 void SolarSystemScene::initShadowResources()
 {
-    _smap = TexDepth::Make("shadowMap", 4096, 4096);
+    _smap = TexDepth::Make("shadowMap", 512, 512);
     _smap->SetCompareMode();
     _fbo = Framebuffer::Make(_smap);
 
-    // glm::mat4 bias = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f))
-    //                * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+    glm::mat4 bias = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f))
+                   * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
 
     for (const auto& [name, pair] : _ptr_map)
     {
         auto& [orbit, astro] = pair;
-        glm::mat4 modelMatrix = astro->GetTransform()->GetMatrix(); // posição, rotação, escala
-        glm::mat4 lightSpace =  _shadowCamera->GetProjMatrix()
+        glm::mat4 modelMatrix = astro->GetModelMatrix(); 
+        glm::mat4 lightSpace =  bias * _shadowCamera->GetProjMatrix()
                                            * _shadowCamera->GetViewMatrix()
                                            * modelMatrix;
-                                        //    * bias;
 
-        auto mtex = Variable<glm::mat4>::Make("Mtex",lightSpace);
+        auto mtex = Variable<glm::mat4>::Make("Mtex", lightSpace);
         astro->AddAppearance(mtex);
+        _mtex_map[name] = mtex;
     }
 }

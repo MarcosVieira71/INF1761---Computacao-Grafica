@@ -66,6 +66,7 @@ int Window::Run(int width, int height, const std::string &title)
         float dt = t - t0;
         _solar->Render(dt);
         t0 = t;
+
         glfwSwapBuffers(_window);
         glfwPollEvents();
 

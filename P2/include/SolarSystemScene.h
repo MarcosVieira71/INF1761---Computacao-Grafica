@@ -61,6 +61,8 @@ private:
     SolarShaders::ShaderSet _shaders;
 
     std::map<std::string, std::tuple<OrbitPtr, AstralBodyPtr>> _ptr_map;
+    std::map<std::string, VariablePtr<glm::mat4>> _mtex_map;
+    bool _smap_attached = false;
 };
 
 

@@ -19,6 +19,6 @@ void main() {
     vFragPos = worldPos.xyz;
     vNormal = normalize((Mn * vec4(normal, 0.0)).xyz);
     vTexCoord = texcoord;
-    vShadowCoord = Mtex * vec4(vFragPos, 1.0);
+    vShadowCoord = Mtex * vec4(vertex, 1.0);
     gl_Position = Mvp * vec4(vertex, 1.0);
 }

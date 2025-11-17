@@ -13,7 +13,6 @@ uniform vec4 ldif;
 uniform vec4 lspe;
 uniform vec4 cpos;
 uniform sampler2D decal;  
-uniform int hasTexture;
 uniform int isEmissive;
 uniform vec3 emissionColor;
 
@@ -26,25 +25,19 @@ void main() {
     float spec = pow(max(dot(R, V), 0.0), 32.0);
 
     float distance = length(lpos.xyz - vFragPos);
-    float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
 
     vec3 ambient = lamb.rgb * color.rgb;
     vec3 diffuse = ldif.rgb * color.rgb * diff;
     vec3 specular = lspe.rgb * spec;
 
-    vec3 lighting = (ambient + diffuse + specular) * attenuation;
+    vec3 lighting = (ambient + diffuse + specular);
     if (isEmissive == 1) lighting += emissionColor;
     vec3 result;
     float alpha;
 
-    if (hasTexture == 1) {
-        vec4 texColor = texture(decal, vTexCoord);
-        result = lighting * texColor.rgb;
-        alpha = color.a * texColor.a;
-    } else {
-        result = lighting;
-        alpha = color.a;
-    }
+    vec4 texColor = texture(decal, vTexCoord);
+    result = lighting * texColor.rgb;
+    alpha = color.a * texColor.a;
 
     outcolor = vec4(result, alpha);
 }
