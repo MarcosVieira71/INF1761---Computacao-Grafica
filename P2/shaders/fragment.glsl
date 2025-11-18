@@ -63,3 +63,13 @@ void main() {
 
     outcolor = vec4(result, alpha);
 }
+
+
+// void main() {
+//     vec3 proj = vShadowCoord.xyz / vShadowCoord.w;
+//     proj = proj * 0.5 + 0.5;
+//     float depth = texture(shadowMap, vec3(proj.xy, proj.z));
+
+//     outcolor = vec4(vec3(depth), 1.0);
+// }
+
