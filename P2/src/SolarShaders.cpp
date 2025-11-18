@@ -32,7 +32,7 @@ SolarShaders::ShaderSet SolarShaders::CreateShaders(const LightPtr &light)
     s.sky->AttachFragmentShader("../shaders/sky_fragment.glsl");
     s.sky->Link();
 
-    s.shadow = Shader::Make(light, "world");
+    s.shadow = Shader::Make(nullptr, "world");
     s.shadow->AttachVertexShader("../shaders/shadow_vertex.glsl");
     s.shadow->AttachFragmentShader("../shaders/shadow_fragment.glsl");
     s.shadow->Link();

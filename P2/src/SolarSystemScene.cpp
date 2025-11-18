@@ -99,9 +99,9 @@ void SolarSystemScene::FinalizeScene(const ShaderPtr &shader, const ShaderPtr &s
     auto skyNode = Node::Builder().WithShader(skyShader).AddAppearance(skyApp).AddShape(SkyBox::Make()).Build();
     auto root = Node::Builder().WithShader(shader).AddNode(skyNode).AddNode(orbSun).Build();
     _scene = Scene::Make(root);
-    // _scene->AddEngine(engine);
+    _scene->AddEngine(engine);
 
-    _shadowCamera = Camera3D::Make(0.0f, 200.0f, 0.0f);
+    _shadowCamera = Camera3D::Make(0.0f, 0.0f, 0.0f);
     _shadowCamera->SetUpDir(0.0f, 0.0f, 1.0f);
     _shadowCamera->SetOrtho(true);
     _shadowCamera->SetAngle(90.0f);
@@ -201,11 +201,16 @@ void SolarSystemScene::RenderShadow()
     glm::mat4 viewMat = _shadowCamera->GetViewMatrix();
     glm::mat4 projMat = _shadowCamera->GetProjMatrix();
 
+    _scene->GetRoot()->SetShader(_shaders.shadow);
+
+    glm::mat4 bias = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f))
+                   * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+
     for (const auto& [name, pair] : _ptr_map)
     {
         auto& [orbit, astro] = pair;
         glm::mat4 modelMatrix = astro->GetModelMatrix();
-        glm::mat4 lightSpace = projMat * viewMat * modelMatrix;
+        glm::mat4 lightSpace = bias * projMat * viewMat * modelMatrix;
 
         auto it = _mtex_map.find(name);
         if (it != _mtex_map.end()) {
@@ -214,6 +219,8 @@ void SolarSystemScene::RenderShadow()
     }
 
     _scene->Render(_shadowCamera);
+
+    _scene->GetRoot()->SetShader(_shaders.main);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
     glDisable(GL_CULL_FACE);
@@ -234,9 +241,9 @@ void SolarSystemScene::initShadowResources()
     {
         auto& [orbit, astro] = pair;
         glm::mat4 modelMatrix = astro->GetModelMatrix(); 
-        glm::mat4 lightSpace =  bias * _shadowCamera->GetProjMatrix()
-                                           * _shadowCamera->GetViewMatrix()
-                                           * modelMatrix;
+        glm::mat4 proj = _shadowCamera->GetProjMatrix();
+        glm::mat4 view = _shadowCamera->GetViewMatrix();
+        glm::mat4 lightSpace = bias * proj * view * modelMatrix;
 
         auto mtex = Variable<glm::mat4>::Make("Mtex", lightSpace);
         astro->AddAppearance(mtex);

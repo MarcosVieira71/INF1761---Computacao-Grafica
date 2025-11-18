@@ -24,8 +24,8 @@ float getShadow(vec4 sc, float bias)
 {
     vec3 proj = sc.xyz / sc.w;
     proj = proj * 0.5 + 0.5;
-    if (proj.z > 1.0) return 1.0;
-    if (proj.x < 0.0 || proj.x > 1.0 || proj.y < 0.0 || proj.y > 1.0) return 1.0;
+    // if (proj.z > 1.0) return 1.0;
+    // if (proj.x < 0.0 || proj.x > 1.0 || proj.y < 0.0 || proj.y > 1.0) return 1.0;
 
     float shadow = 0.0;
     float texel = 1.0 / 512.0; 
