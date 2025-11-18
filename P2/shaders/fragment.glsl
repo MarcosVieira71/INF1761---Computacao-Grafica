@@ -38,38 +38,38 @@ float getShadow(vec4 sc, float bias)
 }
 
 
-void main() {
-    vec3 N = normalize(vNormal);
-    vec3 L = normalize(lpos.xyz - vFragPos);
-    float diff = max(dot(N, L), 0.0);
-    vec3 V = normalize(cpos.xyz - vFragPos);
-    vec3 R = reflect(-L, N);
-    float spec = pow(max(dot(R, V), 0.0), 32.0);
-
-    vec3 ambient = lamb.rgb * color.rgb;
-    vec3 diffuse = ldif.rgb * color.rgb * diff;
-    vec3 specular = lspe.rgb * spec;
-
-    // compute bias and shadow factor (use slightly larger minimum bias to reduce acne)
-    float bias = max(0.001, 0.005 * (1.0 - max(dot(N, L), 0.0)));
-    float shadow = getShadow(vShadowCoord, bias);
-
-    vec3 lighting = ambient + (diffuse + specular) * shadow;
-    if (isEmissive == 1) lighting += emissionColor;
-
-    vec4 texColor = texture(decal, vTexCoord);
-    vec3 result = lighting * texColor.rgb;
-    float alpha = color.a * texColor.a;
-
-    outcolor = vec4(result, alpha);
-}
-
-
 // void main() {
-//     vec3 proj = vShadowCoord.xyz / vShadowCoord.w;
-//     proj = proj * 0.5 + 0.5;
-//     float depth = texture(shadowMap, vec3(proj.xy, proj.z));
+//     vec3 N = normalize(vNormal);
+//     vec3 L = normalize(lpos.xyz - vFragPos);
+//     float diff = max(dot(N, L), 0.0);
+//     vec3 V = normalize(cpos.xyz - vFragPos);
+//     vec3 R = reflect(-L, N);
+//     float spec = pow(max(dot(R, V), 0.0), 32.0);
 
-//     outcolor = vec4(vec3(depth), 1.0);
+//     vec3 ambient = lamb.rgb * color.rgb;
+//     vec3 diffuse = ldif.rgb * color.rgb * diff;
+//     vec3 specular = lspe.rgb * spec;
+
+//     // compute bias and shadow factor (use slightly larger minimum bias to reduce acne)
+//     float bias = max(0.001, 0.005 * (1.0 - max(dot(N, L), 0.0)));
+//     float shadow = getShadow(vShadowCoord, bias);
+
+//     vec3 lighting = ambient + (diffuse + specular) * shadow;
+//     if (isEmissive == 1) lighting += emissionColor;
+
+//     vec4 texColor = texture(decal, vTexCoord);
+//     vec3 result = lighting * texColor.rgb;
+//     float alpha = color.a * texColor.a;
+
+//     outcolor = vec4(result, alpha);
 // }
+
+
+void main() {
+    vec3 proj = vShadowCoord.xyz / vShadowCoord.w;
+    proj = proj * 0.5 + 0.5;
+    float depth = texture(shadowMap, vec3(proj.xy, proj.z));
+
+    outcolor = vec4(vec3(depth), 1.0);
+}
 

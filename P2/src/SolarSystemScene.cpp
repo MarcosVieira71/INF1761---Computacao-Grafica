@@ -99,17 +99,14 @@ void SolarSystemScene::FinalizeScene(const ShaderPtr &shader, const ShaderPtr &s
     auto skyNode = Node::Builder().WithShader(skyShader).AddAppearance(skyApp).AddShape(SkyBox::Make()).Build();
     auto root = Node::Builder().WithShader(shader).AddNode(skyNode).AddNode(orbSun).Build();
     _scene = Scene::Make(root);
-    _scene->AddEngine(engine);
+    // _scene->AddEngine(engine);
 
-    // place the shadow camera above the scene and use orthographic projection
-    // moved closer and increased angle to better cover the system
     _shadowCamera = Camera3D::Make(0.0f, 200.0f, 0.0f);
     _shadowCamera->SetUpDir(0.0f, 0.0f, 1.0f);
     _shadowCamera->SetOrtho(true);
     _shadowCamera->SetAngle(90.0f);
     _shadowCamera->SetZPlanes(0.1f, 2000.0f);
 
-    // ensure the light used by shaders references the sun node so lpos is correct
     if (_shaders.main && _shaders.main->GetLight()) {
         _shaders.main->GetLight()->SetReference(std::get<1>(_ptr_map.at("sun")));
     }

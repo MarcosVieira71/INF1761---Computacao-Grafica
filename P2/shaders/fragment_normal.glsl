@@ -40,50 +40,50 @@ float getShadow(vec4 sc, float bias)
 }
 
 
-void main() {
-    vec3 N = normalize(vNormal);
-    vec3 T = normalize(vTangent);
-    vec3 B = normalize(cross(N, T));
-    mat3 TBN = mat3(T, B, N);
-
-    vec3 mapN = texture(normalMap, vTexCoord).rgb;
-    mapN = mapN * 2.0 - 1.0;
-    N = normalize(TBN * mapN);
-
-    vec3 L = normalize(lpos.xyz - vFragPos);
-    float diff = max(dot(N, L), 0.0);
-    vec3 V = normalize(cpos.xyz - vFragPos);
-    vec3 R = reflect(-L, N);
-    float spec = pow(max(dot(R, V), 0.0), 32.0);
-
-    float distance = length(lpos.xyz - vFragPos);
-
-    vec3 ambient = lamb.rgb * color.rgb;
-    vec3 diffuse = ldif.rgb * color.rgb * diff;
-    vec3 specular = lspe.rgb * spec;
-
-    float bias = max(0.001, 0.005 * (1.0 - max(dot(N, L), 0.0)));
-    float shadow = getShadow(vShadowCoord, bias);
-
-    vec3 lighting = ambient + (diffuse + specular) * shadow;
-
-    if (isEmissive == 1) lighting += emissionColor;
-    vec3 result;
-    float alpha;
-
-    vec4 texColor = texture(decal, vTexCoord);
-    result = lighting * texColor.rgb;
-    alpha = color.a * texColor.a;
-
-
-    outcolor = vec4(result, alpha);
-}
-
 // void main() {
-//     vec3 proj = vShadowCoord.xyz / vShadowCoord.w;
-//     proj = proj * 0.5 + 0.5;
-//     float depth = texture(shadowMap, vec3(proj.xy, proj.z));
+//     vec3 N = normalize(vNormal);
+//     vec3 T = normalize(vTangent);
+//     vec3 B = normalize(cross(N, T));
+//     mat3 TBN = mat3(T, B, N);
 
-//     outcolor = vec4(vec3(depth), 1.0);
+//     vec3 mapN = texture(normalMap, vTexCoord).rgb;
+//     mapN = mapN * 2.0 - 1.0;
+//     N = normalize(TBN * mapN);
+
+//     vec3 L = normalize(lpos.xyz - vFragPos);
+//     float diff = max(dot(N, L), 0.0);
+//     vec3 V = normalize(cpos.xyz - vFragPos);
+//     vec3 R = reflect(-L, N);
+//     float spec = pow(max(dot(R, V), 0.0), 32.0);
+
+//     float distance = length(lpos.xyz - vFragPos);
+
+//     vec3 ambient = lamb.rgb * color.rgb;
+//     vec3 diffuse = ldif.rgb * color.rgb * diff;
+//     vec3 specular = lspe.rgb * spec;
+
+//     float bias = max(0.001, 0.005 * (1.0 - max(dot(N, L), 0.0)));
+//     float shadow = getShadow(vShadowCoord, bias);
+
+//     vec3 lighting = ambient + (diffuse + specular) * shadow;
+
+//     if (isEmissive == 1) lighting += emissionColor;
+//     vec3 result;
+//     float alpha;
+
+//     vec4 texColor = texture(decal, vTexCoord);
+//     result = lighting * texColor.rgb;
+//     alpha = color.a * texColor.a;
+
+
+//     outcolor = vec4(result, alpha);
 // }
+
+void main() {
+    vec3 proj = vShadowCoord.xyz / vShadowCoord.w;
+    proj = proj * 0.5 + 0.5;
+    float depth = texture(shadowMap, vec3(proj.xy, proj.z));
+
+    outcolor = vec4(vec3(depth), 1.0);
+}
 
