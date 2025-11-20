@@ -22,6 +22,8 @@
 #include "Light.h"
 #include "Cylinder.h"
 #include "Orbit.h"
+#include "Quad.h"
+#include "DepthSampler.h"
 #include "AstralBody.h"
 #include "Sphere.h"
 #include "Cube.h"
@@ -56,13 +58,13 @@ SolarSystemScene::SolarSystemScene()
 
     PlanetBuilder::BuildPlanets(_ptr_map, sphere, orbSun, astroSun);
 
-    AstralEnginePtr engine = CreateEngines();
+    AstralEnginePtr engine = nullptr; //CreateEngines();
 
     auto nonEmissive = Emissive::Make(0.f, 0.f, 0.f);
-    AsteroidBelt belt(engine, astroSun, _ptr_map, _shaders.normal, nonEmissive);
-    belt.Generate();
+    // AsteroidBelt belt(engine, astroSun, _ptr_map, _shaders.normal, nonEmissive);
+    // belt.Generate();
 
-    PlanetBuilder::BuildMoonAndRings(_ptr_map, sphere, _shaders.normal);
+    // PlanetBuilder::BuildMoonAndRings(_ptr_map, sphere, _shaders.normal);
 
     FinalizeScene(_shaders.main, _shaders.sky, orbSun, engine, sphere);
 }
@@ -91,21 +93,23 @@ AstralEnginePtr SolarSystemScene::CreateEngines()
 
 void SolarSystemScene::FinalizeScene(const ShaderPtr &shader, const ShaderPtr &skyShader, OrbitPtr orbSun, AstralEnginePtr engine, const ShapePtr &sphere)
 {
-    engine->setEarth(std::get<1>(_ptr_map.at("earth")));
-    engine->setMoon(std::get<1>(_ptr_map.at("moon")));
-    engine->addAxis(std::get<1>(_ptr_map.at("sun")), 2.98f);
+    // engine->setEarth(std::get<1>(_ptr_map.at("earth")));
+    // // engine->setMoon(std::get<1>(_ptr_map.at("moon")));
+    // engine->addAxis(std::get<1>(_ptr_map.at("sun")), 2.98f);
 
     auto skyApp = TexCube::Make("skybox", "../textures/space_cubemap.png");
     auto skyNode = Node::Builder().WithShader(skyShader).AddAppearance(skyApp).AddShape(SkyBox::Make()).Build();
     auto root = Node::Builder().WithShader(shader).AddNode(skyNode).AddNode(orbSun).Build();
     _scene = Scene::Make(root);
-    _scene->AddEngine(engine);
+    // _scene->AddEngine(engine);
 
-    _shadowCamera = Camera3D::Make(0.0f, 0.0f, 0.0f);
+    _shadowCamera = Camera3D::Make(0.0f, 1.0f, 0.0f);
+    _shadowCamera->SetCenter(0.0f, 0.0f, 0.0f);
     _shadowCamera->SetUpDir(0.0f, 0.0f, 1.0f);
     _shadowCamera->SetOrtho(true);
-    _shadowCamera->SetAngle(90.0f);
-    _shadowCamera->SetZPlanes(0.1f, 2000.0f);
+
+    _shadowCamera->SetAngle(90.0f); 
+    _shadowCamera->SetZPlanes(1.0f, 1000.0f);
 
     if (_shaders.main && _shaders.main->GetLight()) {
         _shaders.main->GetLight()->SetReference(std::get<1>(_ptr_map.at("sun")));
@@ -114,15 +118,21 @@ void SolarSystemScene::FinalizeScene(const ShaderPtr &shader, const ShaderPtr &s
         _shaders.normal->GetLight()->SetReference(std::get<1>(_ptr_map.at("sun")));
     }
 
-
     initShadowResources();
 
-    
+    ShaderPtr dbgShader = Shader::Make();
+    dbgShader->AttachVertexShader("../shaders/shadow_debug_vertex.glsl");
+    dbgShader->AttachFragmentShader("../shaders/shadow_debug_fragment.glsl");
+    dbgShader->Link();
+
+    auto depthApp = std::make_shared<DepthAsSampler>(_smap, std::string("shadowMap"));
+    auto quadNode = Node::Builder().WithShader(dbgShader).AddAppearance(depthApp).AddShape(Quad::Make()).Build();
+    _scene->GetRoot()->AddNode(quadNode);
     _cameraAlternative = Camera3D::Make(0.0f, 0.0f, 0.0f);
     _cameraAlternative->SetAngle(45.0f);
     _cameraAlternative->SetZPlanes(0.1f, 3000.0f);
-    _cameraEngine = CameraEngine::Make(_cameraAlternative, std::get<1>(_ptr_map.at("earth")), std::get<1>(_ptr_map.at("moon")), glm::vec3(0.0f, 0.0f, 0.0f));
-    _scene->AddEngine(_cameraEngine);
+    // _cameraEngine = CameraEngine::Make(_cameraAlternative, std::get<1>(_ptr_map.at("earth")), std::get<1>(_ptr_map.at("moon")), glm::vec3(0.0f, 0.0f, 0.0f));
+    // _scene->AddEngine(_cameraEngine);
 
     _camera = Camera3D::Make(-1000.0f, 750.0f, 500.0f);
     _camera->SetCenter(0.0f, 0.0f, 0.0f);
@@ -187,7 +197,7 @@ void SolarSystemScene::RenderShadow()
 {
     _fbo->Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, 512, 512);
+    glViewport(0, 0, 8192, 8192);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
@@ -230,7 +240,7 @@ void SolarSystemScene::RenderShadow()
 
 void SolarSystemScene::initShadowResources()
 {
-    _smap = TexDepth::Make("shadowMap", 512, 512);
+    _smap = TexDepth::Make("shadowMap", 8192, 8192);
     _smap->SetCompareMode();
     _fbo = Framebuffer::Make(_smap);
 

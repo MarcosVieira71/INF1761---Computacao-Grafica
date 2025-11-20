@@ -7,6 +7,7 @@
     #include <GL/gl.h>
 #endif
 
+#include <iostream>
 #include "Light.h"
 #include "Node.h"
 #include "State.h"
@@ -91,5 +92,10 @@ void Light::Load (StatePtr st) const
     M = M * GetReference()->GetModelMatrix();
   }
   glm::vec4 pos = M * m_pos;
+  std::cout << "pos: ("
+          << pos.x << ", "
+          << pos.y << ", "
+          << pos.z << ", "
+          << pos.w << ")\n";
   shd -> SetUniform ("lpos",pos);
 }

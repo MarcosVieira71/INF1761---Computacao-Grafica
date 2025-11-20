@@ -22,20 +22,18 @@ void PlanetBuilder::BuildPlanets(std::map<std::string, std::tuple<OrbitPtr, Astr
                                  OrbitPtr orbSun,
                                  AstralBodyPtr astroSun)
 {
-    std::array<std::string, 8> names = {"mercury", "venus", "earth",
-                                        "mars", "jupiter", "saturn", "uranus", "neptune"};
+    std::array<std::string, 3> names = {"mercury", "venus", "earth"};
+                                        // "mars", "jupiter", "saturn", "uranus", "neptune"};
 
-    std::array<glm::vec3, 8> scales = {
+    std::array<glm::vec3, 3> scales = {
         glm::vec3{0.003f, 0.003f, 0.003f} * 25.0f,
         glm::vec3{0.008f, 0.008f, 0.008f} * 25.0f,
-        glm::vec3{0.009f, -0.009f, 0.009f} * 25.0f,
-        glm::vec3{0.005f, 0.005f, 0.005f} * 25.0f,
-        glm::vec3{0.10f, 0.10f, 0.10f} * 5.0f,
-        glm::vec3{0.08f, 0.08f, 0.08f} * 5.0f,
-        glm::vec3{0.04f, 0.04f, 0.04f} * 10.0f,
-        glm::vec3{0.03f, 0.03f, 0.03f} * 10.0f
-    };
-
+        glm::vec3{0.009f, -0.009f, 0.009f} * 25.0f};
+        // glm::vec3{0.005f, 0.005f, 0.005f} * 25.0f,
+        // glm::vec3{0.10f, 0.10f, 0.10f} * 5.0f,
+        // glm::vec3{0.08f, 0.08f, 0.08f} * 5.0f,
+        // glm::vec3{0.04f, 0.04f, 0.04f} * 10.0f,
+        // glm::vec3{0.03f, 0.03f, 0.03f} * 10.0f};
     int i = 0;
     int k = 0;
     static std::mt19937 rng{ std::random_device{}() };
