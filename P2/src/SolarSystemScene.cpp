@@ -22,6 +22,8 @@
 #include "AsteroidBelt.h"
 #include "SolarShaders.h"
 #include "PlanetBuilder.h"
+#include "Obj.h"
+#include "Transform.h"
 
 #include <array>
 #include <random>
@@ -89,7 +91,17 @@ void SolarSystemScene::FinalizeScene(const ShaderPtr &shader, const ShaderPtr &s
     auto root = Node::Builder().WithShader(shader).AddNode(skyNode).AddNode(orbSun).Build();
     _scene = Scene::Make(root);
     _scene->AddEngine(engine);
-
+    NodePtr ship = LoadObjNode(std::string("../obj/prometheus/prometheus.obj"));
+    if (ship) {
+        ship->SetShader(shader);
+        auto t = Transform::Make();
+        t->Translate(312.5f, 0.0f, 100.0f);
+        // t->Rotate(0,{0,1,0});
+        t->Scale(12.5f, 12.5f, 12.5f);
+        ship->SetTransform(t);
+        _scene->GetRoot()->AddNode(ship);
+    }
+    
     _cameraAlternative = Camera3D::Make(0.0f, 0.0f, 0.0f);
     _cameraAlternative->SetAngle(45.0f);
     _cameraAlternative->SetZPlanes(0.1f, 3000.0f);
