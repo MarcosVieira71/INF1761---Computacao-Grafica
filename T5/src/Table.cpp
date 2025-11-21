@@ -6,15 +6,14 @@
 #include "Cylinder.h"
 #include "Transform.h"
 
-
-Table::Leg::LegPtr Table::Leg::Make(const glm::vec3& pos, float height, ShapePtr s)
+Table::Leg::LegPtr Table::Leg::Make(const glm::vec3 &pos, float height, ShapePtr s)
 {
     return std::make_shared<Leg>(pos, height, s);
 }
 
 Table::Leg::~Leg() = default;
 
-Table::Leg::Leg(const glm::vec3& relativePos, float height, ShapePtr s)
+Table::Leg::Leg(const glm::vec3 &relativePos, float height, ShapePtr s)
 {
     auto trfLegs = Transform::Make();
 
@@ -25,14 +24,14 @@ Table::Leg::Leg(const glm::vec3& relativePos, float height, ShapePtr s)
     SetTransform(trfLegs);
 }
 
-Table::Top::TopPtr Table::Top::Make(const glm::vec3& scale)
+Table::Top::TopPtr Table::Top::Make(const glm::vec3 &scale)
 {
     return std::make_shared<Top>(scale);
 }
 
 Table::Top::~Top() = default;
 
-Table::Top::Top(const glm::vec3& scale)
+Table::Top::Top(const glm::vec3 &scale)
 {
     auto trfCube = Transform::Make();
     trfCube->Scale(scale.x, scale.y, scale.z);
@@ -40,8 +39,7 @@ Table::Top::Top(const glm::vec3& scale)
     SetTransform(trfCube);
 }
 
-
-Table::Table(const glm::vec3& pos, AppearancePtr app) : _pos(pos)
+Table::Table(const glm::vec3 &pos, AppearancePtr app) : _pos(pos)
 {
     auto trfTable = Transform::Make();
     trfTable->Translate(pos.x, pos.y, pos.z);
@@ -50,15 +48,20 @@ Table::Table(const glm::vec3& pos, AppearancePtr app) : _pos(pos)
     SetTransform(trfTable);
 }
 
-TablePtr Table::Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs)
+TablePtr Table::Make(const glm::vec3 &pos, AppearancePtr app, AppearancePtr legs)
 {
     auto table = std::make_shared<Table>(pos, app);
-    table->AddNode(Table::Top::Make({5.0f, 0.2f, 5.0f}));
-    if(!legs) legs = app;
-    
+    table->_top = Table::Top::Make({5.0f, 0.2f, 5.0f});
+    table->_top->AddAppearance(app);
+    table->_top->AddAppearance(Color::Make(1.0f, 1.0f, 1.0f, 0.2f));
+    table->AddNode(table->_top);
+
+    if (!legs)
+        legs = app;
+
     auto nLegsApp = Node::Builder().AddAppearance(legs).Build();
     table->AddNode(nLegsApp);
-    ShapePtr s = Cylinder::Make(1,1,64);
+    ShapePtr s = Cylinder::Make(1, 1, 64);
     nLegsApp->AddNode(Table::Leg::Make(glm::vec3(2.0, -2.5f, 2.0), 5.0f, s));
     nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.5f, 2.0), 5.0f, s));
     nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.5f, -2.0), 5.0f, s));
@@ -66,13 +69,9 @@ TablePtr Table::Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs
     return table;
 }
 
-void Table::setup(BasePtr base)
+void Table::setup(NodePtr base)
 {
     AddNode(base);
 }
 
-
-
-
 Table::~Table() = default;
-

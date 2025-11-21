@@ -37,7 +37,8 @@ void main() {
 
     vec4 texColor = texture(decal, vTexCoord);
     result = lighting * texColor.rgb;
-    alpha = color.a * texColor.a;
+    alpha = color.a;
+
 
     outcolor = vec4(result, alpha);
 }
