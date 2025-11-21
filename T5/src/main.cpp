@@ -16,6 +16,7 @@
 #include "Texture.h"
 #include "AstralEngine.h"
 #include "Emissive.h"
+#include "ParticleEmitter.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -131,9 +132,20 @@ int main()
 	orbEarth->setup(astroEarth);
 	table->setup(base);
 
+	auto particleShader = Shader::Make(light, "camera");
+	particleShader->AttachVertexShader("../shaders/particle_vertex.glsl");
+	particleShader->AttachGeometryShader("../shaders/particle_geometry.glsl");
+	particleShader->AttachFragmentShader("../shaders/particle_fragment.glsl");
+	particleShader->Link();
+
+	auto emitterShape = ParticleEmitter::Make();
+	auto emitterNode = Node::Builder()
+							.WithShader(particleShader)
+							.AddShape(emitterShape)
+							.Build();
+	astroSun->AddNode(emitterNode);
+
 	light->SetReference(astroSun);
-
-
 
 	auto root = Node::Builder()
 					.WithShader(shader)

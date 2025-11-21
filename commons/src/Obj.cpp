@@ -101,7 +101,7 @@ ObjPtr Obj::MakeFromFile(const std::string& filename)
           }
           if (ti!=0) {
             glm::vec2 uv = texcoords[ (ti>0?ti-1:texcoords.size()+ti) ];
-            out_texcoords.push_back(uv.x);
+            out_texcoords.push_back(1.0f - uv.x);
             out_texcoords.push_back(uv.y);
           } else {
             out_texcoords.push_back(0.0f); out_texcoords.push_back(0.0f);
