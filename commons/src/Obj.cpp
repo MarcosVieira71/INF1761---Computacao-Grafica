@@ -212,6 +212,59 @@ static std::string find_texture_in_mtl(const std::string& mtlpath, const std::st
   return found;
 }
 
+static std::string find_first_map_in_mtl(const std::string& mtlpath)
+{
+  std::ifstream in(mtlpath);
+  if (!in) return std::string();
+  std::string line;
+  std::string current;
+  while (std::getline(in, line)) {
+    if (line.size() < 2) continue;
+    std::istringstream iss(line);
+    std::string tag; iss >> tag;
+    if (tag == "newmtl") {
+      iss >> current;
+    } else if (tag == "map_Kd") {
+      std::string rest;
+      std::getline(iss, rest);
+      size_t start = rest.find_first_not_of(" \t");
+      if (start == std::string::npos) continue;
+      std::string tex = rest.substr(start);
+      if (!tex.empty() && tex.front() == '"' && tex.back() == '"') {
+        tex = tex.substr(1, tex.size()-2);
+      }
+      {
+        std::istringstream iss2(tex);
+        std::string part;
+        std::string candidate;
+        while (iss2 >> part) {
+          candidate = part;
+        }
+        if (!candidate.empty()) tex = candidate;
+      }
+      for (char &c : tex) if (c == '\\') c = '/';
+      return tex;
+    }
+  }
+  return std::string();
+}
+
+static bool find_first_kd_in_mtl(const std::string& mtlpath, glm::vec3 &kd)
+{
+  std::ifstream in(mtlpath);
+  if (!in) return false;
+  std::string line;
+  while (std::getline(in, line)) {
+    if (line.size() < 2) continue;
+    std::istringstream iss(line);
+    std::string tag; iss >> tag;
+    if (tag == "Kd") {
+      float r,g,b; if (iss >> r >> g >> b) { kd = glm::vec3(r,g,b); return true; }
+    }
+  }
+  return false;
+}
+
 NodePtr LoadObjNode(const std::string& filename)
 {
   std::ifstream in(filename);
@@ -242,6 +295,7 @@ NodePtr LoadObjNode(const std::string& filename)
     if (pos != std::string::npos) basedir = filename.substr(0,pos+1);
     std::string mtlpath = basedir + mtlfile;
     std::string tex = find_texture_in_mtl(mtlpath, usedmat);
+    bool applied = false;
     if (!tex.empty()) {
       std::string texpath = basedir + tex;
       std::ifstream fin(texpath);
@@ -249,11 +303,41 @@ NodePtr LoadObjNode(const std::string& filename)
         fin.close();
         AppearancePtr app = Texture::Make(std::string("decal"), texpath);
         builder.AddAppearance(app);
+        applied = true;
       } else {
-        std::cerr << "Warning: texture not found: " << texpath << ". Using white fallback." << std::endl;
-        AppearancePtr app = Texture::Make(std::string("decal"), glm::vec3(1.0f,1.0f,1.0f));
-        builder.AddAppearance(app);
+        std::cerr << "Warning: texture not found: " << texpath << "." << std::endl;
       }
+    }
+
+    if (!applied) {
+      std::string anymap = find_first_map_in_mtl(mtlpath);
+      if (!anymap.empty()) {
+        std::string texpath = basedir + anymap;
+        std::ifstream fin(texpath);
+        if (fin) {
+          fin.close();
+          AppearancePtr app = Texture::Make(std::string("decal"), texpath);
+          builder.AddAppearance(app);
+          applied = true;
+        } else {
+          std::cerr << "Warning: fallback texture not found: " << texpath << "." << std::endl;
+        }
+      }
+    }
+
+    if (!applied) {
+      glm::vec3 kd;
+      if (find_first_kd_in_mtl(mtlpath, kd)) {
+        AppearancePtr app = Texture::Make(std::string("decal"), kd);
+        builder.AddAppearance(app);
+        applied = true;
+      }
+    }
+
+    if (!applied) {
+      std::cerr << "Warning: texture not found in MTL: " << mtlpath << ". Using white fallback." << std::endl;
+      AppearancePtr app = Texture::Make(std::string("decal"), glm::vec3(1.0f,1.0f,1.0f));
+      builder.AddAppearance(app);
     }
   }
 

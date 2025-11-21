@@ -11,9 +11,6 @@ using TablePtr = std::shared_ptr<Table>;
 class Appearance;
 using AppearancePtr = std::shared_ptr<Appearance>;
 
-class Base;
-using BasePtr = std::shared_ptr<Base>;
-
 
 class Table : public Node
 {   
@@ -45,7 +42,7 @@ class Table : public Node
 
 
         Table(const glm::vec3& pos, AppearancePtr app);
-        void setup(BasePtr base);
+        void setup(NodePtr base);
 
         ~Table();
 

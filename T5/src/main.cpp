@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "Node.h"
 #include "Shader.h"
+#include "Obj.h"
 #include "Color.h"
 #include "Transform.h"
 #include "Table.h"
@@ -115,7 +116,16 @@ int main()
 	OrbitPtr orbEarth = Orbit::Make();
 	AstralBodyPtr astroEarth = AstralBody::Make({4.0f, 0.0f, 0.0f}, {0.5f, -0.5f, 0.5f}, {Texture::Make("decal", "../textures/earth.jpg"), Emissive::Make(0.0f, 0.0f, 0.0f)});
 
-
+    NodePtr cake = LoadObjNode(std::string("../obj/10868_birthday-cake_v3.obj"));
+    if (cake) {
+        cake->SetShader(shader);
+        auto t = Transform::Make();
+        t->Translate(1.0f, 0.25f, 1.5f);
+		t->Rotate(-90, {1,0,0});
+        t->Scale(0.1f, 0.1f, 0.1f);
+        cake->SetTransform(t);
+        table->setup(cake);
+    }
 	orbSun->setup(astroSun);
 	astroSun->setup(orbEarth);
 	orbEarth->setup(astroEarth);

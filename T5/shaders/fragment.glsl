@@ -37,14 +37,9 @@ void main() {
     vec3 result;
     float alpha;
 
-    if (hasTexture == 1) {
-        vec4 texColor = texture(decal, vTexCoord);
-        result = lighting * texColor.rgb;
-        alpha = color.a * texColor.a;
-    } else {
-        result = lighting;
-        alpha = color.a;
-    }
+    vec4 texColor = texture(decal, vTexCoord);
+    result = lighting * texColor.rgb;
+    alpha = color.a * texColor.a;
 
     outcolor = vec4(result, alpha);
 }

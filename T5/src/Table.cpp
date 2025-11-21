@@ -66,7 +66,7 @@ TablePtr Table::Make(const glm::vec3& pos, AppearancePtr app, AppearancePtr legs
     return table;
 }
 
-void Table::setup(BasePtr base)
+void Table::setup(NodePtr base)
 {
     AddNode(base);
 }
