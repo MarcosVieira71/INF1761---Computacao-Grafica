@@ -8,11 +8,13 @@ layout(location = 3) in vec2 texcoord;
 uniform mat4 Mvp;
 uniform mat4 Mv;
 uniform mat4 Mn;
+uniform mat4 Mtex;
 
 out vec3 vFragPos;
 out vec3 vNormal;
 out vec3 vTangent;
 out vec2 vTexCoord;
+out vec4 vShadowCoord;
 
 void main() {
     vec4 worldPos = Mv * vec4(vertex, 1.0);
@@ -20,5 +22,6 @@ void main() {
     vNormal = normalize((Mn * vec4(normal, 0.0)).xyz);
     vTangent = normalize((Mn * vec4(tangent, 0.0)).xyz);
     vTexCoord = texcoord;
+    vShadowCoord = Mtex * vec4(vertex, 1.0);
     gl_Position = Mvp * vec4(vertex, 1.0);
 }

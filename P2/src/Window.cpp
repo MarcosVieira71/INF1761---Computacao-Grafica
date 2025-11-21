@@ -57,14 +57,20 @@ int Window::Run(int width, int height, const std::string &title)
 
     while (!glfwWindowShouldClose(_window))
     {
+
+        _solar->RenderShadow();        
+
+        //RenderNoShadow
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         float t = float(glfwGetTime());
-        _solar->GetScene()->Update(t - t0);
+        float dt = t - t0;
+        _solar->Render(dt);
         t0 = t;
-        _solar->GetScene()->Render(_solar->GetActiveCamera());
+
         glfwSwapBuffers(_window);
         glfwPollEvents();
 
+        //Fps        
         fpsFrames++;
         double fpsNow = glfwGetTime();
         double elapsed = fpsNow - fpsLastTime;

@@ -7,18 +7,24 @@
 
 #include "Scene.h"
 #include "Camera3D.h"
-
+#include "Variable.h"
+#include "SolarShaders.h"
 
 
 class CameraEngine;
 class Orbit;
 class AstralBody;
 class AstralEngine;
+class TexDepth;
+class Framebuffer;
 
 using AstralBodyPtr = std::shared_ptr<AstralBody>;
 using OrbitPtr = std::shared_ptr<Orbit>;
 using CameraEnginePtr = std::shared_ptr<CameraEngine>;
 using AstralEnginePtr = std::shared_ptr<AstralEngine>;
+using TexDepthPtr = std::shared_ptr<TexDepth>;
+using FramebufferPtr = std::shared_ptr<Framebuffer>;
+
 
 
 class SolarSystemScene {
@@ -33,6 +39,9 @@ public:
     ArcballPtr GetArcball() const;
     const std::map<std::string, std::tuple<OrbitPtr, AstralBodyPtr>>& GetPtrMap() const;
 
+    void Render(float dt);
+    void initShadowResources();
+    void RenderShadow();
     void SetActiveCamera(const Camera3DPtr &c);
 
 private:
@@ -41,9 +50,20 @@ private:
 
     ScenePtr _scene;
     Camera3DPtr _camera;
+    Camera3DPtr _shadowCamera;
     Camera3DPtr _cameraAlternative;
     Camera3DPtr _activeCamera;
     CameraEnginePtr _cameraEngine;
+    
     ArcballPtr _arcball;
+    TexDepthPtr _smap;
+    FramebufferPtr _fbo;
+    SolarShaders::ShaderSet _shaders;
+
     std::map<std::string, std::tuple<OrbitPtr, AstralBodyPtr>> _ptr_map;
+    std::map<std::string, VariablePtr<glm::mat4>> _mtex_map;
+    bool _smap_attached = false;
 };
+
+
+
