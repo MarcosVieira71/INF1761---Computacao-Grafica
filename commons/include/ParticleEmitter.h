@@ -8,11 +8,11 @@ using ParticleEmitterPtr = std::shared_ptr<ParticleEmitter>;
 
 class ParticleEmitter : public Shape {
 public:
-    static ParticleEmitterPtr Make(float radius = 1.25f);
-    ParticleEmitter(float radius = 1.25f);
+    static ParticleEmitterPtr Make(float radius = 1.25f, float size = 0.01f);
+    ParticleEmitter(float radius = 1.25f, float size = 0.01f);
     ~ParticleEmitter();
     virtual void Draw(StatePtr st) override;
 private:
-    unsigned int vao_, vbo_;
-    float radius_;
+    unsigned int _vao, _vbo;
+    float _radius, _size;
 };

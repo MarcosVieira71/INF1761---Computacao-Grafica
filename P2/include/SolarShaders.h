@@ -10,6 +10,7 @@ namespace SolarShaders {
         ShaderPtr normal;
         ShaderPtr sky;
         ShaderPtr shadow;
+        ShaderPtr particles;
     };
 
     LightPtr CreateLight();

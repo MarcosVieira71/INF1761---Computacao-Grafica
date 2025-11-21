@@ -36,6 +36,7 @@
 #include "Transform.h"
 #include "Framebuffer.h"
 #include "TexDepth.h"
+#include "ParticleEmitter.h"
 
 #include <array>
 #include <random>
@@ -55,7 +56,12 @@ SolarSystemScene::SolarSystemScene()
         sphere);
     orbSun->setup(astroSun);
     _ptr_map["sun"] = {orbSun, astroSun};
-
+	auto emitterShape = ParticleEmitter::Make(300.f, 1.0f);
+	auto emitterNode = Node::Builder()
+						   .WithShader(_shaders.particles)
+						   .AddShape(emitterShape)
+						   .Build();
+	astroSun->AddNode(emitterNode);
     PlanetBuilder::BuildPlanets(_ptr_map, sphere, orbSun, astroSun);
 
     AstralEnginePtr engine = CreateEngines();

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(T5)
+project(P3)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,19 +17,19 @@ file(GLOB SOURCES
     "${CMAKE_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(T5 ${SOURCES})
+add_executable(P3 ${SOURCES})
 
-target_link_libraries(T5 PRIVATE commons)
+target_link_libraries(P3 PRIVATE commons)
 
 if(WIN32)
-    target_link_libraries(T5 PRIVATE glfw glew32 opengl32)
+    target_link_libraries(P3 PRIVATE glfw glew32 opengl32)
 elseif(APPLE)
     find_library(COCOA Cocoa REQUIRED)
     find_library(IOKIT IOKit REQUIRED)
     find_library(COREVIDEO CoreVideo REQUIRED)
     find_library(OPENGL OpenGL REQUIRED)
-    target_link_libraries(T5 PRIVATE glfw GLEW ${OPENGL} ${COCOA} ${IOKIT} ${COREVIDEO})
+    target_link_libraries(P3 PRIVATE glfw GLEW ${OPENGL} ${COCOA} ${IOKIT} ${COREVIDEO})
 else() # Linux
     find_package(OpenGL REQUIRED)
-    target_link_libraries(T5 PRIVATE glfw GLEW ${OPENGL_LIBRARIES} dl pthread)
+    target_link_libraries(P3 PRIVATE glfw GLEW ${OPENGL_LIBRARIES} dl pthread)
 endif()

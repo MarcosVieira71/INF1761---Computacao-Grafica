@@ -108,7 +108,7 @@ int main()
 	shader->Link();
 
 	TablePtr table = Table::Make({0.0f, 0.0f, 0.0f}, Texture::Make("decal", "../textures/vidro.jpg"), Texture::Make("decal", "../textures/metal.jpg"));
-	MoonGlobePtr globe = MoonGlobe::Make({-2.0f, 1.0f, -1.5f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
+	MoonGlobePtr globe = MoonGlobe::Make({-1.5f, 1.0f, -0.5f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
 
 	BasePtr base = Base::Make(1, 1, {0.0f, 0.6f, 0.0f}, {0.10f, 1.0f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
 	base->setup(globe);

@@ -58,7 +58,7 @@ int Window::Run(int width, int height, const std::string &title)
     while (!glfwWindowShouldClose(_window))
     {
 
-        _solar->RenderShadow();        
+        // _solar->RenderShadow();        
 
         //RenderNoShadow
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -13,18 +13,18 @@
 
 #include <vector>
 
-ParticleEmitterPtr ParticleEmitter::Make(float radius) {
-    return std::make_shared<ParticleEmitter>(radius);
+ParticleEmitterPtr ParticleEmitter::Make(float radius, float size) {
+    return std::make_shared<ParticleEmitter>(radius, size);
 }
 
-ParticleEmitter::ParticleEmitter(float radius)
-: vao_(0), vbo_(0), radius_(radius)
+ParticleEmitter::ParticleEmitter(float radius, float size)
+: _vao(0), _vbo(0), _radius(radius), _size(size)
 {
     float point[3] = {0.0f, 0.0f, 0.0f};
-    glGenVertexArrays(1, &vao_);
-    glGenBuffers(1, &vbo_);
-    glBindVertexArray(vao_);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+    glGenVertexArrays(1, &_vao);
+    glGenBuffers(1, &_vbo);
+    glBindVertexArray(_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(point), point, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0); 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -33,17 +33,17 @@ ParticleEmitter::ParticleEmitter(float radius)
 }
 
 ParticleEmitter::~ParticleEmitter() {
-    if (vbo_) glDeleteBuffers(1, &vbo_);
-    if (vao_) glDeleteVertexArrays(1, &vao_);
+    if (_vbo) glDeleteBuffers(1, &_vbo);
+    if (_vao) glDeleteVertexArrays(1, &_vao);
 }
 
 void ParticleEmitter::Draw(StatePtr st)
 {
     ShaderPtr shd = st->GetShader();
-    shd->SetUniform("radius", radius_);
+    shd->SetUniform("radius", _radius);
     float t = float(glfwGetTime());
     shd->SetUniform("time", t);
-    shd->SetUniform("particleSize", 0.01f);
+    shd->SetUniform("particleSize", _size);
     glm::mat4 proj = st->GetCamera()->GetProjMatrix();
     shd->SetUniform("Proj", proj);
 
@@ -51,7 +51,7 @@ void ParticleEmitter::Draw(StatePtr st)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glDepthMask(GL_FALSE);
 
-    glBindVertexArray(vao_);
+    glBindVertexArray(_vao);
     glDrawArrays(GL_POINTS, 0, 1);
     glBindVertexArray(0);
 
