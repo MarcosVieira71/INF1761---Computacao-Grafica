@@ -11,10 +11,7 @@ BasePtr Base::Make(float radius, float height, const glm::vec3 &pos, const glm::
     auto t = Transform::Make();
     t->Translate(0.0f, -1.32f, 0.0f);
     t->Scale(0.5f, 0.5f, 0.5f);
-    auto c = Node::Builder().AddShape(Cube::Make()).WithTransform(t).Build();
     auto base = std::make_shared<Base>(radius, height, pos, scale, app);
-
-    base->AddNode(c);
     base->AddNode(base->_pivot);
 
     return base;

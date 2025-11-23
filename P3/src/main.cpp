@@ -68,6 +68,13 @@ static void cursorpos(GLFWwindow *win, double x, double y)
 		g_arcball->AccumulateMouseMotion(int(xf), int(yf));
 }
 
+glm::vec4 GetReflectedClipPlane(const glm::vec4 worldPlane, Camera3DPtr camera)
+{
+	glm::vec4 eyePlane = glm::transpose(glm::inverse(camera->GetViewMatrix())) * worldPlane;
+	eyePlane.y = -eyePlane.y;
+	return eyePlane;
+}
+
 int main()
 {
 	if (!glfwInit())
@@ -110,7 +117,7 @@ int main()
 	TablePtr table = Table::Make({0.0f, 0.0f, 0.0f}, Texture::Make("decal", "../textures/vidro.jpg"), Texture::Make("decal", "../textures/metal.jpg"));
 	MoonGlobePtr globe = MoonGlobe::Make({-1.5f, 1.0f, -0.5f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
 
-	BasePtr base = Base::Make(1, 1, {0.0f, 0.6f, 0.0f}, {0.10f, 1.0f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
+	BasePtr base = Base::Make(1, 1, {0.0f, 0.6f, 0.0f}, {0.10f, 1.7f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
 	base->setup(globe);
 
 	OrbitPtr orbSun = Orbit::Make();
@@ -125,12 +132,10 @@ int main()
 		t->Rotate(-90, {1, 0, 0});
 		t->Scale(0.1f, 0.1f, 0.1f);
 		cake->SetTransform(t);
-		table->setup(cake);
 	}
 	base->setup(orbSun);
 
 	orbSun->setup(astroSun);
-	table->setup(base);
 
 	auto particleShader = Shader::Make(light, "camera");
 	particleShader->AttachVertexShader("../shaders/particle_vertex.glsl");
@@ -147,9 +152,19 @@ int main()
 
 	light->SetReference(astroSun);
 
+	auto reflectedObjects = Node::Builder().WithShader(shader).Build();
+
+	if (cake)
+	{
+		reflectedObjects->AddNode(cake);
+	}
+
+	reflectedObjects->AddNode(base);
+
 	auto root = Node::Builder()
 					.WithShader(shader)
 					.AddNode(table)
+					.AddNode(reflectedObjects)
 					.Build();
 
 	auto scene = Scene::Make(root);
@@ -168,10 +183,11 @@ int main()
 
 	float t0 = float(glfwGetTime());
 
-	table->SetShader(shader);
+	table->_top->SetShader(shader);
 
-	ScenePtr reflectorScene = Scene::Make(table);
+	ScenePtr reflectorScene = Scene::Make(table->_top);
 
+	glm::vec4 worldPlane(0.0f, 1.0f, 0.0f, -0.2f);
 	while (!glfwWindowShouldClose(window))
 	{
 		float t = float(glfwGetTime());
@@ -184,27 +200,43 @@ int main()
 		glStencilFunc(GL_NEVER, 1, 0xffff);
 		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
 
-		reflectorScene->Render(camera);
+		glm::vec4 reflectedEyePlane = GetReflectedClipPlane(worldPlane, g_camera);
+
+		double planeVector[4] = {
+			(double)reflectedEyePlane.x,
+			(double)reflectedEyePlane.y,
+			(double)reflectedEyePlane.z,
+			(double)reflectedEyePlane.w};
+
+		glDepthMask(GL_FALSE);
+
+		reflectorScene->Render(g_camera);
+		glDepthMask(GL_TRUE);
 
 		glStencilFunc(GL_EQUAL, 1, 0xffff);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
-		NodePtr root = scene->GetRoot();
+		glEnable(GL_CLIP_PLANE0);
+		glClipPlane(GL_CLIP_PLANE0, planeVector);
+
 		TransformPtr trf = Transform::Make();
 		trf->Scale(1.0f, -1.0f, 1.0f);
-		root->SetTransform(trf);
+		reflectedObjects->SetTransform(trf);
+
 		glFrontFace(GL_CW);
-		scene->Render(camera);
+		scene->Render(g_camera);
 		glFrontFace(GL_CCW);
-		root->SetTransform(nullptr);
+		reflectedObjects->SetTransform(nullptr);
+
+		glDisable(GL_CLIP_PLANE0);
 
 		glDisable(GL_STENCIL_TEST);
 
-		scene->Render(camera);
+		scene->Render(g_camera);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		reflectorScene->Render(camera);
+		reflectorScene->Render(g_camera);
 		glDisable(GL_BLEND);
 
 		glfwSwapBuffers(window);
