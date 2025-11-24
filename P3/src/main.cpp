@@ -117,7 +117,7 @@ int main()
 	TablePtr table = Table::Make({0.0f, 0.0f, 0.0f}, Texture::Make("decal", "../textures/vidro.jpg"), Texture::Make("decal", "../textures/metal.jpg"));
 	MoonGlobePtr globe = MoonGlobe::Make({-1.5f, 1.0f, -0.5f}, Texture::Make("decal", "../textures/red.jpg"), {Texture::Make("decal", "../textures/moon.jpg")});
 
-	BasePtr base = Base::Make(1, 1, {0.0f, 0.6f, 0.0f}, {0.10f, 1.7f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
+	BasePtr base = Base::Make(1, 1, {0.0f, 0.6f, 0.0f}, {0.10f, 1.8f, 0.10f}, Texture::Make("decal", "../textures/base.jpg"));
 	base->setup(globe);
 
 	OrbitPtr orbSun = Orbit::Make();
@@ -128,7 +128,7 @@ int main()
 	{
 		cake->SetShader(shader);
 		auto t = Transform::Make();
-		t->Translate(1.0f, 0.25f, 1.5f);
+		t->Translate(0.2f, 0.25f, 1.5f);
 		t->Rotate(-90, {1, 0, 0});
 		t->Scale(0.1f, 0.1f, 0.1f);
 		cake->SetTransform(t);

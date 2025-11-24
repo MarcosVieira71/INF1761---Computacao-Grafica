@@ -62,10 +62,10 @@ TablePtr Table::Make(const glm::vec3 &pos, AppearancePtr app, AppearancePtr legs
     auto nLegsApp = Node::Builder().AddAppearance(legs).Build();
     table->AddNode(nLegsApp);
     ShapePtr s = Cylinder::Make(1, 1, 64);
-    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(2.0, -2.5f, 2.0), 5.0f, s));
-    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.5f, 2.0), 5.0f, s));
-    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.5f, -2.0), 5.0f, s));
-    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(2.0, -2.5f, -2.0), 5.0f, s));
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(2.0, -2.51f, 2.0), 5.0f, s));
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.51f, 2.0), 5.0f, s));
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(-2.0, -2.51f, -2.0), 5.0f, s));
+    nLegsApp->AddNode(Table::Leg::Make(glm::vec3(2.0, -2.51f, -2.0), 5.0f, s));
     return table;
 }
 
